@@ -9,7 +9,7 @@ const count=Number(process.env.SEQUENCE_FRAMES||181);
 if(!Number.isInteger(count)||count<2)throw Error('SEQUENCE_FRAMES must be an integer of at least 2');
 const versioned=spawnSync(process.execPath,['scripts/build-asset-versions.cjs'],{stdio:'inherit'});if(versioned.status!==0)throw Error('Media fingerprint build failed');
 const sourceFiles=['showcase-render.worker.mjs','showcase-motion.mjs','stand-reference.mjs','stand-layout.mjs','showcase-setting.mjs','showcase-venues.mjs','cached-lighting.mjs','asset-url.mjs'];
-const revision=crypto.createHash('sha256').update(sourceFiles.map(name=>fs.readFileSync('static/'+name)).join('')+fs.readFileSync('scripts/build-showcase-sequence.py','utf8')+'|'+count+'|2x-v2-mobile912').digest('hex').slice(0,12);
+const revision=crypto.createHash('sha256').update(sourceFiles.map(name=>fs.readFileSync('static/'+name)).join('')+fs.readFileSync('scripts/build-showcase-sequence.py','utf8')+fs.readFileSync('scripts/showcase_motion_encode.py','utf8')+'|'+count+'|2x-v2-mobile912').digest('hex').slice(0,12);
 const output=path.resolve('static/showcase-sequence',revision);
 (async()=>{
  const browser=await chromium.launch({channel:'chrome',headless:true});

@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import sys
 from PIL import Image, ImageStat
+from showcase_motion_encode import encode_motion
 
 root = Path(sys.argv[1]).resolve()
 manifest = {'version': 1, 'revision': root.name, 'variants': {}}
@@ -27,7 +28,8 @@ for name in ('desktop', 'mobile'):
             total += size
             if index % 30 == 0:
                 print(name, 'encoded', index, '/', capture['count'], flush=True)
-    manifest['variants'][name] = {**capture, 'bytes': total, 'motionNative': True, 'base': '/static/showcase-sequence/' + root.name + '/' + name + '/'}
+    movie = encode_motion(folder, capture)
+    manifest['variants'][name] = {**capture, 'bytes': total, 'motionNative': True, 'movie': movie, 'base': '/static/showcase-sequence/' + root.name + '/' + name + '/'}
     print(name, capture['count'], 'validated frames;', round(total / 1024 / 1024, 2), 'MiB full sequence', flush=True)
 destination = root.parent / 'manifest.json'
 temporary = destination.with_suffix('.tmp')

@@ -20,7 +20,7 @@ const path=require('node:path');
   assert.equal(requests.some(u=>u.includes('goldkey-airport-hero-luxury.webp')),false,'hidden legacy hero image was downloaded');
   assert.equal(await page.locator('#stand-studio').count(),0);
   await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true',null,{timeout:90000});
-  await page.waitForFunction(()=>document.querySelector('#showcase').dataset.renderer==='hybrid-live',null,{timeout:60000});
+  assert.equal(await page.locator('#showcase').getAttribute('data-renderer'),'sequence');
   await page.locator('[data-go="3"]').click();await page.waitForFunction(()=>Number(document.querySelector('#showcase')?.dataset.renderProgress)>.86);
   await page.locator('[data-pocket="5"]').click();await page.waitForFunction(()=>document.querySelector('#showcase-viewport canvas').dataset.selectedSlot==='bottom-3');
   await page.locator('#showcase-file').setInputFiles(path.resolve('static/artwork/your-edition.png'));await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.artwork==='custom');

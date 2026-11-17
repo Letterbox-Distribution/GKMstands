@@ -1,48 +1,53 @@
 # Scroll animation rendering
 
-The editable Three.js stand remains the source. The cached opening appears immediately while the worker renderer warms behind it. Once the live worker matches the displayed pose, it takes over continuous scrolling and releases the image cache. `/?frames=1` retains the image-only path for comparison; `/?live=1` forces direct live startup. `/?renderer=main` retains the compatibility path.
+The editable Three.js stand remains the source. Normal scrolling uses an independently seekable H.264 motion cache, generated from the approved 2x renders. It does not initialize the 3D worker. The cached opening appears immediately; the lightweight native decoder prepares during the first-visit entry. When the entry is skipped, it uses the first decoded frame directly rather than forcing a pre-roll delay.
 
-The approved studio, partial turn, materials, magazine covers and six A5 spaces are retained. The digital advert is decoded separately but painted into the same canvas as the stand, using the captured screen projection. It has no separately moving DOM overlay. Changing the advert does not require rebuilding the stand sequence.
+Scroll progress chooses the pose; the movie does not play through independently. Input is eased over 55 ms, and pending seeks are coalesced to the newest target. Each decoded frame is pinned with a VideoFrame where supported and painted with its matching screen projection into one canvas. The digital advert pauses during active scrolling and resumes after 180 ms of rest, keeping its last frame attached to the moving stand.
 
-## Rebuild after a model, lighting or camera change
+Slot selection or artwork upload initializes the live worker behind the cached pose and swaps only after it matches that exact position. Queued artwork actions then apply. Steel, glass, magazine covers, framing and six A5 spaces retain the same editable source. The live camera moves around a stationary stand so its 2048-pixel shadows can be reused.
 
-Start Flask at `http://127.0.0.1:5001`, install the Python requirements and Node development dependencies, then run:
+`/?live=1` forces direct live startup. `/?frames=1&images=1` exercises the legacy WebP player without automatic live warmup. `/?renderer=main` retains the compatibility renderer. Missing or unsupported motion media falls back to the WebP player and live renderer. System reduced-motion preferences remain supported.
+
+## Rebuild after model, lighting or camera changes
+
+Start Flask at `http://127.0.0.1:5001`, install the Python and Node dependencies, and provide FFmpeg on PATH or set `FFMPEG_PATH`. Then run:
 
 ```
 npm run build:showcase
 ```
 
-Set `BASE_URL` if the server uses another address. Set `PYTHON` to a Python executable with Pillow if needed. Chrome must be installed. The script drives the actual OffscreenCanvas worker at 181 exact progress values, waits for each rendered frame and captures WebP at 2x resolution. Desktop logical size is 1440 x 910; mobile is 390 x 912. All six cover textures load before capture, at up to 2048 pixels. Shadows retain a 2048-pixel map.
+Set `BASE_URL` for another server address and `PYTHON` for another Python executable. Chrome is required for capture. The script captures 181 deterministic poses from the actual worker at 2x resolution: 2880 x 1820 desktop and 780 x 1824 mobile. Cover textures remain up to 2048 pixels. Every WebP is checked for dimensions and nonblank content.
 
-The encoder validates every frame's dimensions and presence, creates native-resolution compressed motion frames, and atomically publishes `static/showcase-sequence/manifest.json`. A failed capture/validation does not replace the previous manifest. Revision directories and versioned frame URLs permit persistent browser caching. Commit the new revision and manifest together; remove obsolete revisions only after confirming no published manifest needs them.
+The encoder produces native-size H.264 with every frame independently decodable, plus native-size compressed WebP fallback frames. It pipes one source frame at a time to bound encoding memory. The manifest publishes atomically after both variants succeed. Motion URLs include a content hash; HTTP caching and range requests support repeated visits and seeking without rebuilding the stand on each page load.
 
-Text, controls, layouts, booking logic, uploaded artwork and advert content remain editable without this rebuild. Renders take several minutes locally; actual duration depends on the GPU and encoder.
+Text, controls, booking logic, uploaded artwork and advert content remain editable without rebuilding the stand. Model or camera changes require the capture command; encoding an existing capture alone uses `python scripts/showcase_motion_encode.py static/showcase-sequence/<revision>`.
 
-## Loading and memory
+## Loading, resolution and memory
 
-The first frame loads immediately. The temporary frame canvas uses CPU-backed drawing to avoid contending with the live worker's shader compilation. Live rendering keeps its native pixel ratio (up to 2x) throughout scrolling rather than reducing sharpness during movement. Both motion frames and settled frames retain the native 2x pixel dimensions. Motion frames use more efficient WebP compression (quality 82); settled frames use the high-quality master (quality 94). The player preloads in the scroll direction, never substitutes a thumbnail, and holds the nearest sharp frame when a requested frame is still loading. The legacy small seek atlas is not used by the player.
+Motion and settled frames retain the same 2x dimensions; motion never substitutes a thumbnail. A high-quality WebP replaces a settled video pose. The motion files are approximately 23.2 MiB desktop and 7.7 MiB mobile. The browser can progressively buffer the movie and may preload the remaining data; first display does not require the entire file. The reverse direction uses the same seekable movie.
 
-The complete sequence is not downloaded on entry. Current-frame requests take priority and decoded images are evicted under a 72 MiB image-cache budget. A bounded 8 MiB compressed-frame cache warms the next positions without decoding them all; HTTP cache also retains compressed assets independently. Very fast jumps or slow connections can briefly hold the previous sharp frame rather than lower its resolution. The advert and drawing canvas add memory outside the image cache.
+Normal scrolling no longer fetches and decodes a series of individual WebPs. One pinned motion frame is retained at a time and closed when replaced. Native video buffering is browser managed. The separate decoded WebP fallback cache remains bounded at 72 MiB, with an 8 MiB compressed prefetch cache. Those limits exclude browser media buffers, the drawing canvas and GPU allocations.
 
-The live renderer initializes behind the current frame and replaces it only after the matching camera position renders. Advert decoding starts after the first stand frame and pauses during automatic warmup so it does not compete with shader compilation. The stand remains stationary while the camera orbits; its 2048-pixel shadow map is reused rather than rebuilt every frame. Steel reflections still respond to the moving camera. The sequence cache is then released. Navigation terminates workers, closes bitmaps and removes listeners; bfcache returns reload the cached page without replaying the entry logo. Missing manifests use live rendering; missing exact/seek frames can activate the live fallback. System reduced-motion preferences remain supported; automatic live warmup is disabled for that preference.
+Navigation closes pinned frames, disposes the decoder and terminates any live worker. Hidden pages pause decoding. The first-visit entry remains approximately two seconds and is independent of graphics compilation; same-tab returns skip it.
 
 ## Verification
 
 ```
-npm run test:sequence
 node tests/showcase-wheel.cjs
-npm run benchmark:showcase
+npm run test:sequence
+npm run test:hero
+npm run test:entry
 ```
 
-The sequence regression covers phone/desktop, forward/reverse jumps, full-resolution settling, memory limits, artwork uploads, slot changes and missing-manifest fallback. Existing campaign and hero tests remain relevant. Benchmarks write their raw results to the operating system temporary directory, not the repository.
+The wheel regression starts measuring on the very first gesture, with a cold HTTP cache. It covers desktop and phone widths, both first entry and skipped entry, forward/reverse input and fast movement. It asserts visible pose updates and that the 3D worker is not requested. It does not wait for a renderer warmup before measuring.
 
-Benchmark measurements use headless Chrome, DPR 2, a cold HTTP cache, 240 animation-frame-driven scroll steps with forward/reverse movement and jumps. Reported frame rate measures browser animation-frame responsiveness, not physical GPU presentation FPS. JavaScript heap excludes external bitmap/GPU memory; decoded image memory is reported separately. Browser network counters do not include every worker request, so they must not be used as a complete live-renderer transfer comparison. Responsiveness latency samples may be sparse during continuous movement; do not overinterpret their percentiles. Physical iPhone/Android hardware and Safari have not been tested.
+The latest immediate-scroll run measured longest moving holds of 100/117 ms at 1440 px (first/skipped entry), and 50/67 ms at 390 px. These are local headless Chrome results, not guarantees for every device or connection. The earlier warmed-renderer result alone was insufficient evidence for initial scrolling. The Browser plugin was unavailable, so checks use installed Playwright with Chrome. Physical phones and Safari have not been tested.
 
-Visual comparisons use matching camera positions on desktop and mobile. Small differences arise from WebP compression, image resampling, scroll quantization and the independently timed advert. Source geometry, textures and lighting are shared rather than approximated in a second model.
+Image fallback, native resolution, matching live handover, artwork uploads, resizing, navigation and the two-second entry have separate regressions. `npm run benchmark:showcase` compares direct live rendering, legacy images and native motion; page rAF alone does not establish visible stand smoothness.
 
 ## Original image-player measurements, 17 November 2026
 
-These historical page-rAF measurements did not prove that the visible stand changed every frame. Actual wheel recordings subsequently exposed image-delivery holds of up to 917 ms. The default now hands over to the warmed live renderer to avoid those ongoing decode stalls. `tests/showcase-wheel.cjs` measures displayed pose changes during native forward, reverse and fast wheel input on desktop and phone layouts, rather than relying on page frame rate. The desktop and phone native-wheel regression measured a longest moving hold of about 33 ms after takeover. Cold shader compilation still depends on the device; the cached opening remains visible during that warmup and can still pause briefly. The approximately two-second intro remains independent of GPU readiness.
+These historical page-rAF measurements did not prove that the visible stand changed every frame. Actual wheel recordings subsequently exposed image-delivery holds of up to 917 ms. An intermediate live-renderer trial reduced holds after takeover to about 33 ms, but its graphics startup still competed with initial scrolling. The native motion cache described above supersedes that trial and is tested from the first gesture, including when the entry is skipped.
 
 The earlier measurements follow for reference:
 

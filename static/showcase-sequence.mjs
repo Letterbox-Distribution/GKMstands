@@ -1,4 +1,5 @@
-// Cached opening and fallback; warm the live renderer for continuous scrolling.
+import {createMotionPlayer} from './showcase-motion-player.mjs';
+// Native cached motion for first-scroll responsiveness; live 3D for artwork interaction.
 const clamp=n=>Math.max(0,Math.min(1,n));
 export async function createSequenceRenderer(canvas,replaceCanvas,{preferLive=false}={}){
  const response=await fetch('/static/showcase-sequence/manifest.json');
@@ -13,8 +14,9 @@ export async function createSequenceRenderer(canvas,replaceCanvas,{preferLive=fa
 
 class SequenceRenderer{
  constructor(canvas,manifest,replaceCanvas,preferLive){
-  // Keep the temporary frame player off the GPU command queue while WebGL warms.
-  this.canvas=canvas;this.context=canvas.getContext('2d',{alpha:false,willReadFrequently:true});this.manifest=manifest;this.replaceCanvas=replaceCanvas;this.preferLive=preferLive&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  // Native video uses GPU-backed drawing; image fallback stays off the warming 3D queue.
+  const nativeMotion=manifest.variants[innerWidth<=760?'mobile':'desktop'].movie&&!new URLSearchParams(location.search).has('images')&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  this.canvas=canvas;this.context=canvas.getContext('2d',{alpha:false,willReadFrequently:!nativeMotion});this.manifest=manifest;this.replaceCanvas=replaceCanvas;this.preferLive=preferLive&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
   this.cache=new Map();this.loading=new Map();this.encoded=new Map();this.warming=new Map();this.warmFailed=new Set();this.failed=new Set();this.active=true;this.progress=0;this.target=0;this.frame=0;this.lastMotion=performance.now();this.bytes=0;this.maxBytes=72*1024*1024;this.liveQueue=[];
  }
  emit(data){this.onmessage?.({data});}
@@ -28,8 +30,8 @@ class SequenceRenderer{
   if(data.type==='init'||data.type==='state'){
    const previous=this.target;this.progress=clamp(data.progress||0);this.width=data.width;this.height=data.height;this.active=data.active!==false;
    const variant=this.manifest.variants[this.width<=760?'mobile':'desktop'];
-   if(variant!==this.variant){this.clear();this.variant=variant;this.failed.clear();this.canvas.dataset.model='reference-premium-v3';this.canvas.dataset.plasticHolders='18';this.canvas.dataset.editableSlots='6';}
-   this.target=Math.round(this.progress*(variant.count-1));if(this.preferLive&&!this.activating&&!this.live)this.activateLive();
+   if(variant!==this.variant){this.clear();this.variant=variant;this.prepareMovie();this.failed.clear();this.canvas.dataset.model='reference-premium-v3';this.canvas.dataset.plasticHolders='18';this.canvas.dataset.editableSlots='6';}
+   this.target=Math.round(this.progress*(variant.count-1));this.motionPlayer?.setTarget(this.target,this.active&&!this.activating);if(this.preferLive&&!this.motionPlayer&&!this.activating&&!this.live)this.activateLive();
    if(previous!==this.target){
     this.lastMotion=performance.now();
     this.direction=Math.sign(this.target-previous)||this.direction||1;
@@ -71,6 +73,11 @@ class SequenceRenderer{
  pump(){
   if(!this.active||this.disposed||this.live)return;
   const exact=this.target,direction=this.direction||1;
+  if(this.motionPlayer){
+   this.motionPlayer.setTarget(exact,this.active&&!this.activating);
+   if(!this.presented||performance.now()-this.lastMotion>140)this.load(exact,true);
+   return;
+  }
   // Keep full resolution during motion too. Never replace a sharp frame with a thumbnail.
   const motion=!!this.variant.motionNative;
   if(!this.cache.has('full:'+exact))this.load(exact,!motion);
@@ -79,6 +86,11 @@ class SequenceRenderer{
   const jobs=[exact+direction,exact+direction*2,exact+direction*3,exact-direction];
   for(const index of jobs)if(index>=0&&index<this.variant.count)this.load(index,!motion);
   if(motion)for(let offset=4;offset<=16;offset++){const index=exact+direction*offset;if(index>=0&&index<this.variant.count)this.warm(index);}
+ }
+ prepareMovie(){
+  if(!this.variant.movie||new URLSearchParams(location.search).has('images')||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  document.querySelector('#showcase').dataset.motionTransport='native';
+  this.motionPlayer=createMotionPlayer(this.variant,this.manifest.revision,(video,index)=>{this.movieFrame?.bitmap.close?.();const bitmap=typeof VideoFrame==='function'?new VideoFrame(video,{timestamp:Math.round(video.currentTime*1e6)}):video;this.movieFrame={bitmap,index,full:false,movie:true,sourceWidth:video.videoWidth,sourceHeight:video.videoHeight};this.paint();},()=>{document.querySelector('#showcase').dataset.motionTransport='images';this.motionPlayer?.dispose();this.motionPlayer=null;this.movieFrame?.bitmap.close?.();this.movieFrame=null;this.moviePresented=false;this.schedule();});
  }
  async warm(index){
   if(this.warming.size>=2||this.encoded.has(index)||this.warming.has(index)||this.warmFailed.has(index))return;
@@ -97,7 +109,9 @@ class SequenceRenderer{
  }
  paint(){
   if(!this.variant||this.live)return;
-  let chosen=this.cache.get('full:'+this.target)||(this.variant.motionNative?this.cache.get('seek:'+this.target):null);
+  const exact=this.cache.get('full:'+this.target)||(this.variant.motionNative?this.cache.get('seek:'+this.target):null);
+  let chosen=this.movieFrame||exact;
+  if(exact&&this.moviePresented&&this.movieFrame?.index===this.target&&performance.now()-this.lastMotion>140)chosen=exact;
   if(!chosen){for(const value of this.cache.values())if(!chosen||Math.abs(value.index-this.target)<Math.abs(chosen.index-this.target))chosen=value;}
   if(!chosen)return;
   chosen.used=performance.now();const metadata=this.variant.frames[chosen.index],ctx=this.context;this.displayedProgress=metadata.progress;
@@ -112,12 +126,12 @@ class SequenceRenderer{
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const clip=Number.parseFloat(metadata.clip.match(/inset\(([^p]+)/)?.[1]||'0');
   ctx.beginPath();ctx.rect(0,clip,source.width,source.height-clip);ctx.clip();
-  ctx.drawImage(chosen.bitmap,0,0,source.width,source.height);
+  ctx.drawImage(chosen.bitmap,0,0,source.width,source.height);if(chosen.movie)this.moviePresented=true;
   if(this.video&&metadata.progress<.57)drawScreen(ctx,this.video,metadata.screenCorners);
   ctx.restore();
   if(this.pendingVideo){this.pendingVideo=false;this.emit({type:'video-consumed'});}
   this.presented=true;
-  this.emit({type:'frame',pixelRatio:dpr,progress:metadata.progress,clip:'inset(0px 0 0)',screenCorners:null,points:null,attributes:{...this.canvas.dataset,sequenceFrame:String(chosen.index),sequenceQuality:chosen.full?'full':'motion-native',sequenceSourceWidth:String(chosen.bitmap.width),sequenceSourceHeight:String(chosen.bitmap.height),sequenceCacheBytes:String(this.bytes)},venue:{visible:0,travel:0,ready:true},studio:metadata.studio,camera:metadata.camera,zoom:metadata.zoom,leaflets:metadata.leaflets});
+  this.emit({type:'frame',pixelRatio:dpr,progress:metadata.progress,clip:'inset(0px 0 0)',screenCorners:null,points:null,attributes:{...this.canvas.dataset,sequenceFrame:String(chosen.index),sequenceQuality:chosen.full?'full':chosen.movie?'video-native':'motion-native',sequenceSourceWidth:String(chosen.sourceWidth||chosen.bitmap.width),sequenceSourceHeight:String(chosen.sourceHeight||chosen.bitmap.height),sequenceCacheBytes:String(this.bytes)},venue:{visible:0,travel:0,ready:true},studio:metadata.studio,camera:metadata.camera,zoom:metadata.zoom,leaflets:metadata.leaflets});
  }
  async activateLive(data){
   if(data&&data.type!=='state')this.liveQueue.push(data);if(this.activating)return;this.activating=true;document.querySelector('#showcase').dataset.liveWarmStarted=performance.now().toFixed(1);
@@ -141,7 +155,7 @@ class SequenceRenderer{
   const offscreen=canvas.transferControlToOffscreen();worker.postMessage({type:'init',canvas:offscreen,width:this.width,height:this.height,progress:this.progress,pixelRatio:Math.min(devicePixelRatio||1,2)},[offscreen]);
  }
  liveFailure(canvas){this.preferLive=false;this.pendingLive?.terminate();this.pendingLive=null;this.activating=false;this.liveQueue.forEach(data=>data.bitmap?.close());this.liveQueue=[];canvas.remove();document.querySelector('#showcase-art-status').textContent='Interactive preview unavailable. Please try again.';}
- clear(){this.warming.forEach(controller=>controller.abort());this.warming.clear();this.encoded.clear();this.warmFailed.clear();this.loading.forEach(controller=>controller.abort());this.loading.clear();this.cache.forEach(value=>value.bitmap.close());this.cache.clear();this.bytes=0;}
+ clear(){this.motionPlayer?.dispose();this.motionPlayer=null;this.movieFrame?.bitmap.close?.();this.movieFrame=null;this.moviePresented=false;this.warming.forEach(controller=>controller.abort());this.warming.clear();this.encoded.clear();this.warmFailed.clear();this.loading.forEach(controller=>controller.abort());this.loading.clear();this.cache.forEach(value=>value.bitmap.close());this.cache.clear();this.bytes=0;}
  terminate(){this.disposed=true;cancelAnimationFrame(this.frame);clearTimeout(this.settle);this.clear();this.video?.close();this.liveQueue.forEach(data=>data.bitmap?.close());this.live?.terminate();this.pendingLive?.terminate();}
 }
 

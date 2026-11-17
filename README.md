@@ -120,9 +120,9 @@ Representative location photographs are locally hosted WebP stock images, mapped
 
 ### Cached scroll animation and on-demand 3D
 
-The homepage uses high-resolution prerendered frames from the editable Three.js stand. Normal scrolling no longer initializes WebGL. Slot selection and artwork uploads switch to the original live worker at a matching camera position. The advert is painted into the same surface as the stand so it stays attached during rapid scrolling.
+The homepage uses a native-resolution, independently seekable video cache generated from the editable Three.js stand. Normal scrolling responds from the first gesture without initializing WebGL. High-quality WebP frames remain for settled poses and fallback. Slot selection and artwork uploads switch to the original live worker at a matching camera position. The advert is painted into the same surface as the stand so it stays attached during rapid scrolling.
 
-Run `npm run build:showcase` after model, texture, lighting or camera edits. The local Flask server must be running at port 5001. Run `npm run test:sequence` and `npm run benchmark:showcase` to verify. Use `/?live=1` for a direct comparison with live rendering. See [the rendering guide](docs/showcase-sequence.md) for the rebuild process, cache budget, progressive-loading behaviour, testing and limitations.
+Run `npm run build:showcase` after model, texture, lighting or camera edits. The local Flask server must be running at port 5001. FFmpeg is required for motion-cache rebuilds (`FFMPEG_PATH` can specify its executable). Run `npm run test:sequence`, `node tests/showcase-wheel.cjs` and `npm run benchmark:showcase` to verify. Use `/?live=1` for a direct comparison with live rendering. See [the rendering guide](docs/showcase-sequence.md) for the rebuild process, cache budget, progressive-loading behaviour, testing and limitations.
 
 ### Branded entry
 
