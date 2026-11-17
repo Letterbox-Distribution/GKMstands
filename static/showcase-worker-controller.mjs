@@ -23,7 +23,7 @@ export function startWorkerShowcase(fallback){
  addEventListener('showcase-open',e=>{const slot=e.detail?.slot;go(slot?3:2);if(slot)syncSelection(['top','middle','bottom'].indexOf(slot.shelf)*2+(slot.side==='right'?1:0));if(e.detail?.artwork)setArtwork(e.detail.artwork,e.detail.artworkName)},options);
  addEventListener('showcase-artwork',e=>{if(e.detail?.src)setArtwork(e.detail.src,e.detail.name)},options);
  function playback(){nativeScreen?.setPlaying(ready&&visible&&!document.hidden&&!reduced&&progress<.56);}
- function startVideo(){if(video||disposed)return;nativeScreen=createNativeScreen(host,'/static/video/goldkey-advert-cinematic.mp4');video=nativeScreen.video;if(screenCorners)nativeScreen.update(screenCorners,screenClip);playback();}
+ function startVideo(){if(video||disposed)return;nativeScreen=createNativeScreen(host,'/static/video/goldkey-advert-cinematic.mp4','/static/video/goldkey-advert-cinematic-hd.mp4');video=nativeScreen.video;if(screenCorners)nativeScreen.update(screenCorners,screenClip);playback();}
  function setQuality(ratio){if(!ready||!worker||quality===ratio)return;quality=ratio;worker.postMessage({type:'quality',pixelRatio:ratio});}
  function planUpgrade(){clearTimeout(upgradeTimer);if(upgraded||!ready)return;upgradeTimer=setTimeout(()=>{if(visible&&!document.hidden&&performance.now()-lastScrollAt>400){upgraded=true;setQuality(Math.min(2,Math.max(1.5,devicePixelRatio)));worker.postMessage({type:'upgrade'});}},700);}
  function onScroll(){lastScrollAt=performance.now();if(visible)setQuality(Math.min(1.25,devicePixelRatio));measure();planUpgrade();clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{playback();if(visible)setQuality(Math.min(2,Math.max(1.5,devicePixelRatio)));},220);}
