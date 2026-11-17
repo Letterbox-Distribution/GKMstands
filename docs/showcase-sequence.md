@@ -1,6 +1,6 @@
 # Scroll animation rendering
 
-The editable Three.js stand remains the source. Normal scrolling now uses prerendered frames; the worker renderer starts only for slot selection, direct pocket clicks or artwork uploads. `/?live=1` forces live rendering for comparison. `/?renderer=main` retains the older compatibility path.
+The editable Three.js stand remains the source. The cached opening appears immediately while the worker renderer warms behind it. Once the live worker matches the displayed pose, it takes over continuous scrolling and releases the image cache. `/?frames=1` retains the image-only path for comparison; `/?live=1` forces direct live startup. `/?renderer=main` retains the compatibility path.
 
 The approved studio, partial turn, materials, magazine covers and six A5 spaces are retained. The digital advert is decoded separately but painted into the same canvas as the stand, using the captured screen projection. It has no separately moving DOM overlay. Changing the advert does not require rebuilding the stand sequence.
 
@@ -20,16 +20,17 @@ Text, controls, layouts, booking logic, uploaded artwork and advert content rema
 
 ## Loading and memory
 
-The first frame loads immediately. Both motion frames and settled frames retain the native 2x pixel dimensions. Motion frames use more efficient WebP compression (quality 82); settled frames use the high-quality master (quality 94). The player preloads in the scroll direction, never substitutes a thumbnail, and holds the nearest sharp frame when a requested frame is still loading. The legacy small seek atlas is not used by the player.
+The first frame loads immediately. The temporary frame canvas uses CPU-backed drawing to avoid contending with the live worker's shader compilation. Live rendering keeps its native pixel ratio (up to 2x) throughout scrolling rather than reducing sharpness during movement. Both motion frames and settled frames retain the native 2x pixel dimensions. Motion frames use more efficient WebP compression (quality 82); settled frames use the high-quality master (quality 94). The player preloads in the scroll direction, never substitutes a thumbnail, and holds the nearest sharp frame when a requested frame is still loading. The legacy small seek atlas is not used by the player.
 
 The complete sequence is not downloaded on entry. Current-frame requests take priority and decoded images are evicted under a 72 MiB image-cache budget. A bounded 8 MiB compressed-frame cache warms the next positions without decoding them all; HTTP cache also retains compressed assets independently. Very fast jumps or slow connections can briefly hold the previous sharp frame rather than lower its resolution. The advert and drawing canvas add memory outside the image cache.
 
-Live interaction initializes behind the current frame and replaces it only after the matching camera position renders. The sequence cache is then released. Navigation terminates workers, closes bitmaps and removes listeners; bfcache returns reload the cached page without replaying the entry logo. Missing manifests use live rendering; missing exact/seek frames can activate the live fallback. Reduced-motion controls remain available.
+The live renderer initializes behind the current frame and replaces it only after the matching camera position renders. Advert decoding starts after the first stand frame and pauses during automatic warmup so it does not compete with shader compilation. The stand remains stationary while the camera orbits; its 2048-pixel shadow map is reused rather than rebuilt every frame. Steel reflections still respond to the moving camera. The sequence cache is then released. Navigation terminates workers, closes bitmaps and removes listeners; bfcache returns reload the cached page without replaying the entry logo. Missing manifests use live rendering; missing exact/seek frames can activate the live fallback. System reduced-motion preferences remain supported; automatic live warmup is disabled for that preference.
 
 ## Verification
 
 ```
 npm run test:sequence
+node tests/showcase-wheel.cjs
 npm run benchmark:showcase
 ```
 
@@ -39,7 +40,11 @@ Benchmark measurements use headless Chrome, DPR 2, a cold HTTP cache, 240 animat
 
 Visual comparisons use matching camera positions on desktop and mobile. Small differences arise from WebP compression, image resampling, scroll quantization and the independently timed advert. Source geometry, textures and lighting are shared rather than approximated in a second model.
 
-## Local measurements, 17 November 2026
+## Original image-player measurements, 17 November 2026
+
+These historical page-rAF measurements did not prove that the visible stand changed every frame. Actual wheel recordings subsequently exposed image-delivery holds of up to 917 ms. The default now hands over to the warmed live renderer to avoid those ongoing decode stalls. `tests/showcase-wheel.cjs` measures displayed pose changes during native forward, reverse and fast wheel input on desktop and phone layouts, rather than relying on page frame rate. The desktop and phone native-wheel regression measured a longest moving hold of about 33 ms after takeover. Cold shader compilation still depends on the device; the cached opening remains visible during that warmup and can still pause briefly. The approximately two-second intro remains independent of GPU readiness.
+
+The earlier measurements follow for reference:
 
 Raw results: [showcase-benchmark-2026-11-17.json](showcase-benchmark-2026-11-17.json). These are one local run before the subsequent native-resolution motion-frame refinement, not physical-phone or production guarantees.
 

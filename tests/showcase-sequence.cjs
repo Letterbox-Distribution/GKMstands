@@ -11,7 +11,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
   for(const width of [390,1440]){
    const page=await browser.newPage({viewport:{width,height:1000},deviceScaleFactor:2}),errors=[],requests=[];
    page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>requests.push(request.url()));
-   await page.goto(base);await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true');
+   await page.goto(base+'/?frames=1');await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true');
    await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
    assert.equal(await page.locator('#showcase').getAttribute('data-renderer'),'sequence');
    assert(!requests.some(url=>url.includes('showcase-render.worker.mjs')),'eager live renderer');
@@ -42,7 +42,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
   await missingFrame.goto(base);await missingFrame.waitForFunction(()=>document.querySelector('#showcase')?.dataset.renderer==='hybrid-live',null,{timeout:60000});
   await missingFrame.close();console.log('PASS missing frame files activate live fallback');
   const resize=await browser.newPage({viewport:{width:1440,height:1000}});
-  await resize.goto(base);await resize.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true');
+  await resize.goto(base+'/?frames=1');await resize.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true');
   await resize.setViewportSize({width:390,height:844});
   await resize.waitForFunction(()=>document.querySelector('#showcase-viewport canvas')?.dataset.sequenceQuality==='full');
   assert(await resize.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
