@@ -118,27 +118,22 @@ The entered budget guides automatic suggestions. Manual additions may exceed it;
 Representative location photographs are locally hosted WebP stock images, mapped by setting type and explicitly labelled as representative rather than actual venue photography. Credits/source links are recorded in static/venue-photos/sources.json. Demo airport/library profiles are illustrative and do not add bookable inventory. The floating basket remains available on review; this prototype still does not take payments or reserve placements.
 
 
-### Hero-first loading and off-thread rendering
+### Cached scroll animation and on-demand 3D
 
-The showcase home has one stand experience: the hero. The duplicate optional stand-studio section and hidden legacy hero are omitted from this view. Original mode retains its older studio.
+The homepage uses high-resolution prerendered frames from the editable Three.js stand. Normal scrolling no longer initializes WebGL. Slot selection and artwork uploads switch to the original live worker at a matching camera position. The advert is painted into the same surface as the stand so it stays attached during rapid scrolling.
 
-`showcase.mjs` is now a small loader. Supported browsers use `showcase-worker-controller.mjs` for DOM controls and `showcase-render.worker.mjs` for OffscreenCanvas/WebGL. The worker reuses the same reference stand geometry, materials, camera choreography, environment and artwork slots. The main scrolling thread does not build geometry or compile/render the 3D scene. The high-resolution camera-aligned opening is still the first visual. The digital advert is browser-composited native video, perspective-aligned to the worker-projected screen corners; it plays through scrolling without copying frames into WebGL. High-resolution cover upgrades wait for a brief idle. Hidden hero rendering pauses. Unsupported browsers use `showcase-mainthread.mjs`; `?renderer=main` is available for comparison.
-
-`site-lazy.mjs` loads the planner near its viewport or on a planning CTA, initializes controls before enabling them, and loads client logos near their section. Leaflet and its styles load only when location suggestions are requested. The removed studio's lounge, sample artwork and cover gallery no longer download. Secondary detail/order previews use the existing lightweight CSS model rather than starting extra WebGL renderers. Their Open 3D preview actions return to the hero. Stock photos remain lazy images.
-
-Run `BASE_URL=http://127.0.0.1:5001 npm run test:hero` (PowerShell: set `$env:BASE_URL` first) for the cold-refresh scroll and lazy-loading regression. `test:flow` covers the planner-to-review journey and returning to the hero.
-
+Run `npm run build:showcase` after model, texture, lighting or camera edits. The local Flask server must be running at port 5001. Run `npm run test:sequence` and `npm run benchmark:showcase` to verify. Use `/?live=1` for a direct comparison with live rendering. See [the rendering guide](docs/showcase-sequence.md) for the rebuild process, cache budget, progressive-loading behaviour, testing and limitations.
 
 ### Branded entry
 
-The showcase home now opens with the white GoldKey | Edition entry. It holds until the first live hero frame and fonts are ready, then fades into the page; it is not a fixed timer pretending assets have loaded. The minimum brand reveal is 1.8 seconds, with reduced-motion support. The divider is retained in the permanent header/footer logo. Default A5 artwork is empty again (numbered 1?6); uploads remain optional. Entry files: templates/entry-screen.html, static/entry-screen.css and static/entry-screen.mjs.
+The showcase home now opens with the white GoldKey | Edition entry. It uses an approximately two-second first-visit reveal with reduced-motion support, then opens onto the cached stand. Returning to the page in the same tab skips the entry. The divider is retained in the permanent header/footer logo. Default A5 artwork is empty again (numbered 1?6); uploads remain optional. Entry files: templates/entry-screen.html, static/entry-screen.css and static/entry-screen.mjs.
 
 
 ### Refined digital advert
 
 Current hero creative is static/video/goldkey-advert-cinematic.mp4: 18 seconds, 540 frames, 30 fps, 720x1280 H.264 with BT.709 colour metadata and fast-start. It retains the original warm hospitality photograph and palette, with continuous restrained camera drift, longer reading holds, softer message transitions and a matched loop boundary. Source drawing code is advert-cinematic.mjs; the original 12-second video and creative remain available.
 
-native-screen-video.mjs projects the HTML video onto the display quad with a CSS homography. The worker renders the stand and sends only screen-corner coordinates; it no longer copies video frames or renders the whole stand per advert frame. Video remains muted/inline, starts after hero readiness, continues during the opening camera scroll and pauses offscreen or once the display leaves the close-up. Reduced motion keeps the static poster. Test with BASE_URL set using npm run test:video.
+native-screen-video.mjs supplies decoded advert frames to the active renderer. The frame player composites them into the stand canvas using the captured screen projection; live mode applies them as a texture to the actual screen mesh. Video remains muted/inline, starts after hero readiness, continues during the opening camera scroll and pauses offscreen or once the display leaves the close-up. Reduced motion keeps the static poster. Test with BASE_URL set using npm run test:video.
 
 
 The current homepage is an editorial introduction with the unchanged stand showcase, client logos and service story. Campaign requests live at `/plan`. Requests are saved privately for team confirmation; no payment or automatic email notification is configured. See `docs/editorial-booking.md` for the review queue, image-generation prompts, visual comparison and tests. The previous page remains at `/?view=original`.

@@ -1,0 +1,42 @@
+[
+  {
+    "width": 1440,
+    "frame": 0,
+    "meanAbsoluteChannelDifference": 1.148
+  },
+  {
+    "width": 1440,
+    "frame": 45,
+    "meanAbsoluteChannelDifference": 0.71
+  },
+  {
+    "width": 1440,
+    "frame": 99,
+    "meanAbsoluteChannelDifference": 0.679
+  },
+  {
+    "width": 1440,
+    "frame": 164,
+    "meanAbsoluteChannelDifference": 0.995
+  },
+  {
+    "width": 390,
+    "frame": 0,
+    "meanAbsoluteChannelDifference": 1.727
+  },
+  {
+    "width": 390,
+    "frame": 45,
+    "meanAbsoluteChannelDifference": 1.336
+  },
+  {
+    "width": 390,
+    "frame": 99,
+    "meanAbsoluteChannelDifference": 1.411
+  },
+  {
+    "width": 390,
+    "frame": 164,
+    "meanAbsoluteChannelDifference": 2.054
+  }
+]

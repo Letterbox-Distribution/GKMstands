@@ -13,7 +13,10 @@
     "test:hero": "node tests/hero-loading.cjs",
     "test:entry": "node tests/entry-loading.cjs",
     "test:cache": "python -m unittest discover -s tests -p cache_headers_test.py",
-    "test:booking": "python -m unittest discover -s tests -p booking_requests_test.py"
+    "test:booking": "python -m unittest discover -s tests -p booking_requests_test.py",
+    "build:showcase": "node scripts/capture-showcase-frames.cjs",
+    "benchmark:showcase": "node scripts/benchmark-showcase.cjs",
+    "test:sequence": "node tests/showcase-sequence.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.1"

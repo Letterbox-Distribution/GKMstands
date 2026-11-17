@@ -1,10 +1,25 @@
 import {assetUrl} from './asset-url.mjs';
 
 // Native decoding stays independent of WebGL; use HD only when efficient.
-export function createNativeScreen(host,source,hdSource){
+export function createNativeScreen(host,source,hdSource,onFrame){
  const layer=document.createElement('div');layer.className='native-screen-layer';layer.setAttribute('aria-hidden','true');
  const video=document.createElement('video');video.className='native-screen-video';video.muted=true;video.defaultMuted=true;video.loop=true;video.playsInline=true;video.preload='auto';video.width=720;video.height=1280;layer.append(video);host.append(layer);
  let wanted=false,disposed=false,surfaceWidth=720,surfaceHeight=1280,lastPoints,lastClip,attemptedFallback=false;
+ // In the worker renderer, decoded frames become part of the stand's own texture.
+ // Keep a single frame in flight so fast scrolling cannot build a video queue.
+ let framePending=false;
+ if(onFrame){
+  layer.style.display='none';
+  const capture=async()=>{
+   if(disposed)return;
+   if(wanted&&!framePending&&video.readyState>=2){
+    framePending=true;
+    try{const bitmap=await createImageBitmap(video,{imageOrientation:'flipY'});if(disposed){bitmap.close();framePending=false;}else onFrame(bitmap,()=>{framePending=false;});}catch{framePending=false;}
+   }
+   if(!disposed){if(video.requestVideoFrameCallback)video.requestVideoFrameCallback(capture);else setTimeout(capture,40);}
+  };
+  if(video.requestVideoFrameCallback)video.requestVideoFrameCallback(capture);else setTimeout(capture,40);
+ }
  const reveal=()=>{if(video.readyState>=2)video.style.opacity='1';};video.addEventListener('loadeddata',reveal);
  const begin=selected=>{if(disposed)return;video.style.opacity='0';video.src=assetUrl(selected);video.dataset.quality=selected===hdSource?'1080p':'720p';if(wanted)video.play().catch(()=>{});};
  (async()=>{

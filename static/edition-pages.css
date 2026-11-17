@@ -255,3 +255,48 @@
 .edition-story--reverse figure{justify-self:start;max-width:490px}
 @media(min-width:761px) and (max-width:1000px){.edition-story figure{width:88%;max-width:600px;align-self:center}}
 @media(max-width:760px){.edition-story figure{width:92%;max-width:420px;align-self:center}.edition-story picture{border-radius:12px}}
+
+/* Phone ergonomics: readable controls, room for device insets and compact screens. */
+.edition-home>.header{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(180deg,#fff 10%,#ffffffed 80%,#ffffffd9)}
+@media(max-width:760px){
+ .edition-home .header,.edition-booking .header{padding-left:18px;padding-right:18px;gap:12px}
+ .edition-home .header nav .nav-start,.edition-booking .header nav .nav-start{min-height:44px;align-items:center}
+ .edition-home .showcase-stage{min-height:620px}
+ .edition-home .showcase-progress button{min-height:44px;font-size:11px}
+ .edition-home .showcase .button{min-height:46px;font-size:13px}
+ .edition-home .showcase-scroll{font-size:11px}
+ .edition-home .showcase-bottom{padding-bottom:max(7px,env(safe-area-inset-bottom))}
+ .booking-progress button{min-height:54px;font-size:12px;gap:6px}
+ .booking-campaign-grid button{font-size:14px;line-height:1.5}
+ .booking-cities>div{flex-wrap:wrap}
+ .booking-cities button{min-height:46px;font-size:13px}
+ .booking-fields label,.booking-contact-fields label,.booking-notes{font-size:14px}
+ .booking-fields label>span,.booking-contact-fields label>span{font-size:12px}
+ #booking-city-filters{flex-wrap:wrap}
+ #booking-city-filters button,#booking-map-toggle{min-height:44px;font-size:12px}
+ .booking-venue{border-radius:12px;overflow:hidden}
+ .booking-venue-image{aspect-ratio:1.9/1}
+ .booking-space-grid button{min-height:64px;font-size:13px}
+ .booking-space-grid button small{font-size:12px}
+ .booking-review-line p,.booking-review-line button,.booking-consent{font-size:13px;line-height:1.6}
+ .booking-consent input{width:20px;height:20px;flex-shrink:0}
+ .booking-basket{bottom:calc(8px + env(safe-area-inset-bottom));border-radius:12px;backdrop-filter:none;background:#fffdf9}
+ .booking-basket>div:first-child{flex-wrap:wrap;gap:5px 12px}
+ .booking-basket #basket-budget{font-size:12px;width:100%;line-height:1.5}
+ .booking-basket .edition-button{min-height:46px;font-size:13px;gap:12px}
+ .edition-booking[data-step='2']{padding-bottom:calc(190px + env(safe-area-inset-bottom))}
+ .edition-footer nav{flex-wrap:wrap;row-gap:16px}
+ .edition-button,.edition-text-button,.booking-space-grid button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+}
+@media(max-width:380px){
+ .edition-home .header .edition-brand-svg,.edition-booking .header .edition-brand-svg{width:145px}
+ .edition-home .header nav .nav-start,.edition-booking .header nav .nav-start{font-size:10px;padding:10px}
+ .booking-progress button{flex-direction:column;gap:6px;font-size:11px}
+ .booking-fields{grid-template-columns:1fr}
+ .booking-fields>label:last-child{grid-column:auto}
+ .booking-cities button{flex:1 1 100%;justify-content:space-between}
+ .booking-intro h1{font-size:32px}
+ .edition-home .showcase-copy{left:20px;right:20px}
+ .edition-home .showcase h1,.edition-home .showcase h2{font-size:32px}
+ .edition-home .showcase-scroll{display:none}
+}

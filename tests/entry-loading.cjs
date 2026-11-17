@@ -11,7 +11,7 @@ const assert=require('node:assert/strict');
    await new Promise(resolve=>setTimeout(resolve,3500));
    await route.continue().catch(()=>{});
   });
-  await page.goto(process.env.BASE_URL||'http://127.0.0.1:5001');
+  await page.goto((process.env.BASE_URL||'http://127.0.0.1:5001')+'/?live=1');
   await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
   const timing=await page.evaluate(()=>performance.getEntriesByName('entry-complete')[0].startTime);
   assert.ok(timing<2800,'intro took '+Math.round(timing)+' ms');
