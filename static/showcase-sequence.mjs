@@ -106,7 +106,7 @@ class SequenceRenderer{
   const anchor=(mobile?.92:.86)*(1-focus)+(mobile?.77:.50)*focus;
   const y=this.height*anchor-source.height*anchor*scale;
   const dpr=this.canvas.width/this.width;
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle=Number(metadata.studio)>.99?'#fff':'#e3e0da';ctx.fillRect(0,0,this.width,this.height);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,this.width,this.height);
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const clip=Number.parseFloat(metadata.clip.match(/inset\(([^p]+)/)?.[1]||'0');
   ctx.beginPath();ctx.rect(0,clip,source.width,source.height-clip);ctx.clip();
