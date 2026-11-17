@@ -8,7 +8,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5000';
   page.on('pageerror',error=>errors.push(error.message));
   await page.goto(base);await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
   assert.equal(await page.locator('#planner').count(),0);
-  assert.deepEqual(await page.locator('main>section').evaluateAll(sections=>sections.map(section=>section.id).filter(Boolean)),['showcase','editorial-setting','about','the-service']);
+  assert.deepEqual(await page.locator('main>section').evaluateAll(sections=>sections.map(section=>section.id).filter(Boolean)),['showcase','editorial-setting','about','the-service','placement-details','questions']);
   await page.locator('.header .nav-start').click();await page.waitForFunction(()=>document.body.dataset.bookingReady==='true');
   assert.equal(await page.locator('#showcase').count(),0);
   await page.locator('#booking-brief button[type=submit]').click();assert.equal(await page.locator('#brief-error').isVisible(),true);

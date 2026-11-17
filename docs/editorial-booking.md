@@ -47,3 +47,14 @@ Final A5 photograph prompt:
 > Photorealistic close-up editorial product photograph only, no website UI, no text, no logos. Portrait 4:5 composition for GoldKey Edition. A small neat stack of premium A5 portrait leaflets with an understated botanical photograph on the cover, resting in a very clear slim acrylic holder on a walnut reception console. Beside it a carefully aligned stack of glossy architecture and travel magazines with beautiful neutral landscape covers and unbranded spines. Brushed polished steel lamp detail on left, a simple glass vase with green leaves behind. Soft afternoon window shadows across the warm walnut. Tactile beautiful paper edges, completely clear acrylic, premium material realism, tasteful professional commercial photography, minimal composition, no invented magazine logos or readable words.
 
 Final sign-off also checked the exact generated-concept viewport, 1488x1056, on the main preview at port 5001. About, service and booking screenshots were captured there and reviewed alongside the concept references. The final main-preview booking flow and delayed-worker intro checks passed; the latter completed in 2018ms. All ten Python booking/cache tests passed.
+
+
+## Print-placement refinement
+
+The offer is A5 print placed in the stand; no digital-advertising product or option is offered. The homepage now labels the magazine marquee "Alongside leading titles", explains the placement in three short points and provides accessible native FAQ disclosures. Printing, delivery, quantities and replenishment are explicitly agreed in the final quote rather than assumed included. No unconfirmed response-time promise was added.
+
+The public contact email is info@gkml.co.uk, checked against Gold Key Media's official about page: https://www.gkml.co.uk/about-us/. It appears in the FAQ, footer and booking confirmation. The confirmation explains that the team reviews venue/position/date choices and agrees the quote before booking. Real venue photography is not available in this demo; stock photos are visibly labelled representative.
+
+Location cards show the range of position prices. The six A5 buttons retain numbers 1-6 in a framed 2-column, 3-row diagram; selection adds a tick without losing the number. The phone basket is approximately 91px high with an over-budget message. The booking header is opaque so cards do not blur behind the navigation.
+
+The showcase scroll distance is approximately 20% shorter. Mobile frames were regenerated to fit the complete stand width, with the floor anchor raised for the final view; the master model and interactive camera use the same framing rules. Desktop imagery is unchanged. QA passed at widths 320, 390, 768 and 1440, including FAQ disclosure, slot selection, prices, basket height, artwork and map handoff. Demo SQLite storage remains unchanged; automatic team email and production storage remain separate configuration work.

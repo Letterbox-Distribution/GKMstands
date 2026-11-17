@@ -100,10 +100,10 @@ class SequenceRenderer{
   if(!chosen)return;
   chosen.used=performance.now();const metadata=this.variant.frames[chosen.index],ctx=this.context;
   const mobile=this.width<=760,focus=Number(metadata.zoom),source=this.variant;
-  const radius=(w,h)=>mobile?7.8:Math.max(4.65,5.48/(w/h));
+  const radius=(w,h)=>Math.max((mobile?7.8:Math.max(4.65,5.48/(w/h)))*(1-.55*focus),mobile?1.5/(2*Math.tan(35*Math.PI/360)*(w/h)):0);
   const scale=this.height/source.height*radius(source.width,source.height)/radius(this.width,this.height);
   const x=this.width*(mobile?.5:.71)-source.width*(mobile?.5:.71)*scale;
-  const anchor=(mobile?.92:.86)*(1-focus)+(mobile?.77:.50)*focus;
+  const anchor=(mobile?.92:.86)*(1-focus)+(mobile?.82:.50)*focus;
   const y=this.height*anchor-source.height*anchor*scale;
   const dpr=this.canvas.width/this.width;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,this.width,this.height);

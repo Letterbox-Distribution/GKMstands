@@ -257,6 +257,52 @@
 @media(max-width:760px){.edition-story figure{width:92%;max-width:420px;align-self:center}.edition-story picture{border-radius:12px}}
 
 /* Phone ergonomics: readable controls, room for device insets and compact screens. */
+.edition-home .showcase:not(.showcase-reduced){height:370svh}
+.edition-section-heading h2{font:600 clamp(32px,3vw,48px)/1.15 Manrope,sans-serif;letter-spacing:-.045em;margin:0 0 18px}
+.edition-section-heading>p{font-size:16px;line-height:1.7;color:#756b63;max-width:560px}
+.edition-section-heading .edition-eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8b674c;margin:0 0 18px}
+.edition-section-heading a,.booking-next-steps a{color:#75543e;text-underline-offset:4px}
+.edition-placement{border-top:1px solid #ded1c6;padding:70px 0}
+.edition-placement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;margin-top:42px}
+.edition-placement-grid article>span{font-size:13px;color:#987b64}
+.edition-placement-grid h3{font-size:23px;line-height:1.3;letter-spacing:-.6px;font-weight:500;margin:18px 0 14px}
+.edition-placement-grid p{font-size:16px;line-height:1.75;color:#756b63;margin:0;max-width:360px}
+.edition-faq{display:grid;grid-template-columns:.8fr 1.2fr;gap:8%;padding:65px 0 80px;border-top:1px solid #ded1c6}
+.edition-faq details{border-bottom:1px solid #ded1c6}
+.edition-faq details:first-child{border-top:1px solid #ded1c6}
+.edition-faq summary{display:flex;justify-content:space-between;gap:20px;align-items:center;list-style:none;font-size:18px;font-weight:500;line-height:1.5;padding:23px 0;cursor:pointer}
+.edition-faq summary::-webkit-details-marker{display:none}
+.edition-faq summary::after{content:'+';font-size:23px;font-weight:300;color:#8b674c}
+.edition-faq details[open] summary::after{content:'−'}
+.edition-faq details p{font-size:16px;line-height:1.75;color:#756b63;margin:0 32px 24px 0}
+.booking-venue-price small{display:block;font-size:11px;font-weight:400;line-height:1.5;margin-top:3px}
+.booking-photo-label{position:absolute;bottom:9px;left:10px;padding:4px 7px;background:#fffffff0;border-radius:3px;color:#6e6054;font-size:10px;line-height:1.4}
+.booking-spaces .booking-position-guide{font-size:12px;line-height:1.6;margin:0 0 15px;color:#7d6b5d}
+.booking-space-grid{padding:12px 10px 16px;border:1px solid #bfc0ba;border-bottom:5px solid #a8aaa5;border-radius:3px;background:#f2f0eb;gap:13px 9px}
+.booking-space-grid button{position:relative;min-height:72px;background:#fffdf9;border-bottom-width:3px;border-bottom-color:#aaa99f;padding:12px 9px}
+.booking-position-check{position:absolute;right:5px;top:3px;font-size:11px;color:#75543e}
+.booking-print-note{font-size:14px;line-height:1.7;color:#756b63;margin:18px 0 28px}
+.booking-next-steps{padding:22px 25px;border-radius:8px;background:#faf7f2;margin:30px 0;text-align:left}
+.booking-next-steps>strong{font-size:16px;font-weight:600}
+.booking-next-steps p{font-size:14px;line-height:1.8;color:#756b63;margin:10px 0 0}
+@media(max-width:760px){
+ .edition-home .showcase:not(.showcase-reduced){height:355svh}
+ .edition-home .clients-heading{display:block}
+ .edition-home .clients-heading p{font-size:13px;margin-top:10px}
+ .edition-placement{padding:45px 0}
+ .edition-placement-grid{grid-template-columns:1fr;gap:26px;margin-top:28px}
+ .edition-placement-grid article{border-top:1px solid #e7ddd4;padding-top:20px}
+ .edition-placement-grid h3{margin:9px 0 10px;font-size:22px}
+ .edition-placement-grid p{max-width:none}
+ .edition-faq{display:block;padding:40px 0 45px}
+ .edition-faq-list{margin-top:28px}
+ .edition-faq summary{font-size:16px;padding:20px 0}
+ .edition-faq details p{font-size:15px;margin-right:14px}
+ .edition-section-heading h2{font-size:32px}
+ .booking-space-grid button{font-size:13px}
+ .booking-venue-price strong{font-size:20px}
+ .booking-next-steps{padding:20px;margin:25px 0}
+}
 .edition-home>.header{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(180deg,#fff 10%,#ffffffed 80%,#ffffffd9)}
 @media(max-width:760px){
  .edition-home .header,.edition-booking .header{padding-left:18px;padding-right:18px;gap:12px}
@@ -300,3 +346,19 @@
  .edition-home .showcase h1,.edition-home .showcase h2{font-size:32px}
  .edition-home .showcase-scroll{display:none}
 }
+
+/* Keep checkout close at hand without covering the phone's position chooser. */
+@media(max-width:760px){
+ .booking-basket{padding:10px 13px}
+ .booking-basket>div:first-child{flex-wrap:nowrap;gap:8px;align-items:center;margin-bottom:6px}
+ .booking-basket>div:first-child>strong{display:none}
+ .booking-basket>div:first-child>span{font-size:12px}
+ .booking-basket #basket-budget{width:auto;margin-left:auto;font-size:11px;white-space:nowrap}
+ .booking-basket>div:last-child>span{display:flex;gap:8px;align-items:baseline;font-size:11px}
+ .booking-basket #basket-total{font-size:22px;line-height:1.2;letter-spacing:-.5px}
+ .booking-basket .edition-button{min-height:44px;padding:10px 13px;font-size:12px;gap:12px}
+ .edition-booking[data-step='2']{padding-bottom:calc(135px + env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){.booking-basket .basket-total-label{display:none}}
+.edition-faq summary:focus-visible{outline:2px solid #75543e;outline-offset:4px}
+.edition-booking>.header{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
