@@ -108,13 +108,13 @@ $('#locations-step').addEventListener('click',event=>{
   const {selectVenue:venue_id,selectSpace:slot_id}=choice.dataset,index=state.placements.findIndex(item=>item.venue_id===venue_id&&item.slot_id===slot_id);
   if(index>=0)state.placements.splice(index,1);else state.placements.push({venue_id,slot_id});
   sync();renderDiscovery();document.querySelector('[data-select-venue="'+venue_id+'"][data-select-space="'+slot_id+'"]').focus({preventScroll:true});
-  if(index<0)notify('Space added to your campaign.'+(budgetMessage()?' '+money(total()-state.budget)+' over budget.':''));return;
+  return;
  }
  const card=event.target.closest('.booking-venue');
  if(card&&!event.target.closest('.booking-spaces,a,button,input,select,textarea,label')){const trigger=card.querySelector('[data-open-venue]');trigger.click();return;}
  if(event.target.closest('[data-suggested]')){
   for(const item of suggestSlots(venues,filters()))state.placements.push({venue_id:item.venue.id,slot_id:item.slot.id});
-  sync();renderDiscovery();notify('Suggested spaces added. You can edit any selection.');
+  sync();renderDiscovery();
  }
 });
 $('#booking-search').addEventListener('input',event=>{search=event.target.value.trim().toLowerCase();renderDiscovery(true);});
