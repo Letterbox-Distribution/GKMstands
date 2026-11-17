@@ -1,0 +1,23 @@
+{
+  "publisher_pages": [
+    "https://www.condenast.com/brands",
+    "https://www.hearst.co.uk/brands",
+    "https://www.nationalgeographic.com/"
+  ],
+  "assets": {
+    "vogue": "https://dq45f20nxslxi.cloudfront.net/Vogue_logo_white_078345df71.png",
+    "gq": "https://dq45f20nxslxi.cloudfront.net/new_gq_logo_white_d8695d4a37.png",
+    "tatler": "https://dq45f20nxslxi.cloudfront.net/Tatler_logo_black_e5d118facc.png",
+    "traveller": "https://www.cntraveller.com/ (inline publisher masthead SVG)",
+    "architectural-digest": "https://dq45f20nxslxi.cloudfront.net/AD_logo_white_e22dd4aee8.png",
+    "house-and-garden": "https://dq45f20nxslxi.cloudfront.net/House_And_Garden_MAIN_white_9e2c8023bd.png",
+    "world-of-interiors": "https://dq45f20nxslxi.cloudfront.net/Worldof_Interiors_white_2024_1_828b0bf1d9.png",
+    "national-geographic": "https://assets-cdn.nationalgeographic.com/natgeo/static/icons/redesign-logo.svg"
+  },
+  "inline_svg_sources": {
+    "elle": "https://www.hearst.co.uk/brands/elle",
+    "harpers-bazaar": "https://www.hearst.co.uk/brands/harpers-bazaar",
+    "womens-health": "https://www.hearst.co.uk/brands/womens-health",
+    "elle-decoration": "https://www.hearst.co.uk/brands/elle-decoration"
+  }
+}

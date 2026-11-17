@@ -1,0 +1,7 @@
+__pycache__/
+.venv/
+config.local.json
+.env
+node_modules/
+test-results/
+.qa/

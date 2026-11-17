@@ -1,0 +1,25 @@
+﻿html{scrollbar-gutter:stable}
+html.entry-loading{overflow:hidden}
+.site-entry{display:none;position:fixed;inset:0;z-index:10000;background:#fff;align-items:center;justify-content:center;opacity:1;transition:opacity .32s cubic-bezier(.2,.7,.2,1)}
+.entry-loading .site-entry{display:flex}
+.entry-logo{display:block;position:relative;container-type:inline-size;width:clamp(300px,43vw,530px);max-width:86vw;aspect-ratio:3750/747;transition:opacity .25s ease,transform .32s cubic-bezier(.2,.7,.2,1);transform:translateZ(0);will-change:transform,opacity}
+.entry-goldkey{position:absolute;left:0;top:0;width:56.107%;height:100%;opacity:0;transform:translate3d(0,3px,0);will-change:transform,opacity}
+.entry-goldkey svg{display:block;width:100%;height:100%}
+.entry-divider{position:absolute;left:58.667%;top:16.6%;width:1px;height:55.02%;background:#9c816d;transform:scaleY(0);transform-origin:center;will-change:transform}
+.entry-edition-mask{position:absolute;left:60.8%;top:0;width:39.2%;height:100%;overflow:hidden;display:flex;align-items:center}
+.entry-edition{display:block;position:relative;top:-2.5cqw;white-space:nowrap;font-family:Manrope,Arial,sans-serif;font-size:11.4667cqw;font-weight:300;letter-spacing:-.48cqw;line-height:1;color:#302b27;padding-left:1.333cqw;transform:translate3d(-110%,0,0);will-change:transform}
+.is-animating .entry-goldkey{animation:entry-goldkey-in calc(.35s * var(--entry-pace,1)) ease-out both}
+.is-animating .entry-divider{animation:entry-divider-in calc(.3s * var(--entry-pace,1)) calc(.22s * var(--entry-pace,1)) cubic-bezier(.22,1,.36,1) forwards}
+.is-animating .entry-edition{animation:entry-edition-in calc(.85s * var(--entry-pace,1)) calc(.4s * var(--entry-pace,1)) cubic-bezier(.22,1,.36,1) forwards}
+.site-entry.is-complete{opacity:0}
+.site-entry.is-complete .entry-logo{opacity:0;transform:translateY(-5px)}
+@keyframes entry-goldkey-in{from{opacity:0;transform:translate3d(0,3px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes entry-divider-in{to{transform:scaleY(1)}}
+@keyframes entry-edition-in{to{transform:translate3d(0,0,0)}}
+/* Keep the divider as part of the permanent one-line brand mark. */
+.showcase-enabled .edition-brand-svg{width:254px}
+.showcase-enabled .footer .edition-brand-svg{width:231px}
+@media(max-width:760px){.showcase-enabled .edition-brand-svg,.showcase-enabled .footer .edition-brand-svg{width:196px}}
+@media(prefers-reduced-motion:reduce){.entry-goldkey,.entry-divider,.entry-edition{animation:none;transform:none;opacity:1}.entry-logo,.site-entry{transition:opacity .15s linear}.site-entry.is-complete .entry-logo{transform:none}}
+
+.site-entry:focus{outline:none}

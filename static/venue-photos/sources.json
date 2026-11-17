@@ -1,0 +1,32 @@
+{
+  "airport": {
+    "source": "https://unsplash.com/photos/NaPfgAW3zoE",
+    "credit": "Airport terminal",
+    "license": "Unsplash License",
+    "representative": true
+  },
+  "library": {
+    "source": "https://unsplash.com/photos/kmVR1xWdSxs",
+    "credit": "Leo Okuyama",
+    "license": "Unsplash License",
+    "representative": true
+  },
+  "university": {
+    "source": "https://unsplash.com/photos/3yFrdb1fJ98",
+    "credit": "Christer L?ssman",
+    "license": "Unsplash License",
+    "representative": true
+  },
+  "office": {
+    "source": "https://unsplash.com/photos/AgndPU_229s",
+    "credit": "Vitaly Gariev",
+    "license": "Unsplash License",
+    "representative": true
+  },
+  "hotel": {
+    "source": "https://unsplash.com/photos/FPS7a7XQZ0w",
+    "credit": "Tim Photoguy",
+    "license": "Unsplash License",
+    "representative": true
+  }
+}

@@ -1,0 +1,14 @@
+﻿.venue-photo{position:relative;margin:16px 0 20px;overflow:hidden;border-radius:4px;background:#eee8e1}
+.venue-photo img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover}
+.venue-photo figcaption{padding:8px 10px;font:400 11px/1.6 Manrope,sans-serif;color:#6e6258;background:#faf7f3}
+.venue-photo figcaption a{color:#75543e;margin-left:5px;text-decoration:underline;text-underline-offset:3px}
+.venue-photo--compact{margin:0 0 16px}
+.venue-photo--compact img{height:116px;aspect-ratio:auto}
+.venue-photo--compact figcaption{font-size:10px;padding:5px 8px}
+.venue-number{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;margin-right:5px;background:#75543e;color:#fff;border-radius:50%;font:600 12px/1 Manrope,sans-serif;vertical-align:middle}
+
+.location-detail-photo{min-width:0;align-self:stretch;display:flex}
+.location-detail-photo .venue-photo{margin:0;width:100%;display:flex;flex-direction:column}
+.location-detail-photo .venue-photo img{flex:1;height:100%;min-height:260px;max-height:420px;aspect-ratio:auto;object-fit:cover}
+.location-detail-photo .venue-photo figcaption{flex:none}
+@media(max-width:760px){.location-detail-photo .venue-photo img{flex:none;height:auto;min-height:200px;max-height:280px;aspect-ratio:16/10}}

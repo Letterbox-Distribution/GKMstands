@@ -1,0 +1,501 @@
+[
+  {
+    "id": "ldn-01",
+    "name": "Bloomsbury Exchange",
+    "city": "London",
+    "area": "Bloomsbury",
+    "type": "Office lobby",
+    "lat": 51.521,
+    "lng": -0.125,
+    "audiences": [
+      "Office professionals",
+      "Commuters"
+    ],
+    "descriptors": [
+      "Business visitors"
+    ],
+    "weekly_footfall": 12500,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-dual",
+    "stand_id": "ldn-01-stand-01",
+    "facings": [
+      {
+        "id": "top-left",
+        "shelf": "top",
+        "side": "left",
+        "label": "Top - Left",
+        "weekly_pence": 28000
+      },
+      {
+        "id": "top-right",
+        "shelf": "top",
+        "side": "right",
+        "label": "Top - Right",
+        "weekly_pence": 28000
+      },
+      {
+        "id": "middle-left",
+        "shelf": "middle",
+        "side": "left",
+        "label": "Middle - Left",
+        "weekly_pence": 24000
+      },
+      {
+        "id": "middle-right",
+        "shelf": "middle",
+        "side": "right",
+        "label": "Middle - Right",
+        "weekly_pence": 24000
+      },
+      {
+        "id": "bottom-left",
+        "shelf": "bottom",
+        "side": "left",
+        "label": "Bottom - Left",
+        "weekly_pence": 20000
+      },
+      {
+        "id": "bottom-right",
+        "shelf": "bottom",
+        "side": "right",
+        "label": "Bottom - Right",
+        "weekly_pence": 20000
+      }
+    ]
+  },
+  {
+    "id": "ldn-02",
+    "name": "Southbank House",
+    "city": "London",
+    "area": "Southbank",
+    "type": "Cultural venue",
+    "lat": 51.505,
+    "lng": -0.113,
+    "audiences": [
+      "Leisure visitors",
+      "Travellers"
+    ],
+    "descriptors": null,
+    "weekly_footfall": 18400,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-single",
+    "stand_id": "ldn-02-stand-01",
+    "facings": [
+      {
+        "id": "top-centre",
+        "shelf": "top",
+        "side": "centre",
+        "label": "Top",
+        "weekly_pence": 21000
+      },
+      {
+        "id": "middle-centre",
+        "shelf": "middle",
+        "side": "centre",
+        "label": "Middle",
+        "weekly_pence": 18000
+      },
+      {
+        "id": "bottom-centre",
+        "shelf": "bottom",
+        "side": "centre",
+        "label": "Bottom",
+        "weekly_pence": 15000
+      }
+    ]
+  },
+  {
+    "id": "ldn-03",
+    "name": "Kings Cross Commons",
+    "city": "London",
+    "area": "Kings Cross",
+    "type": "Shared workspace",
+    "lat": 51.535,
+    "lng": -0.125,
+    "audiences": [
+      "Office professionals",
+      "Students"
+    ],
+    "descriptors": [
+      "Business visitors",
+      "Campus community"
+    ],
+    "weekly_footfall": 8200,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-dual",
+    "stand_id": "ldn-03-stand-01",
+    "facings": [
+      {
+        "id": "top-left",
+        "shelf": "top",
+        "side": "left",
+        "label": "Top - Left",
+        "weekly_pence": 24500
+      },
+      {
+        "id": "top-right",
+        "shelf": "top",
+        "side": "right",
+        "label": "Top - Right",
+        "weekly_pence": 24500
+      },
+      {
+        "id": "middle-left",
+        "shelf": "middle",
+        "side": "left",
+        "label": "Middle - Left",
+        "weekly_pence": 21000
+      },
+      {
+        "id": "middle-right",
+        "shelf": "middle",
+        "side": "right",
+        "label": "Middle - Right",
+        "weekly_pence": 21000
+      },
+      {
+        "id": "bottom-left",
+        "shelf": "bottom",
+        "side": "left",
+        "label": "Bottom - Left",
+        "weekly_pence": 17500
+      },
+      {
+        "id": "bottom-right",
+        "shelf": "bottom",
+        "side": "right",
+        "label": "Bottom - Right",
+        "weekly_pence": 17500
+      }
+    ]
+  },
+  {
+    "id": "bham-01",
+    "name": "Colmore Collective",
+    "city": "Birmingham",
+    "area": "Colmore Row",
+    "type": "Office lobby",
+    "lat": 52.482,
+    "lng": -1.901,
+    "audiences": [
+      "Office professionals",
+      "Commuters"
+    ],
+    "descriptors": [
+      "Business visitors"
+    ],
+    "weekly_footfall": 9600,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-dual",
+    "stand_id": "bham-01-stand-01",
+    "facings": [
+      {
+        "id": "top-left",
+        "shelf": "top",
+        "side": "left",
+        "label": "Top - Left",
+        "weekly_pence": 16800
+      },
+      {
+        "id": "top-right",
+        "shelf": "top",
+        "side": "right",
+        "label": "Top - Right",
+        "weekly_pence": 16800
+      },
+      {
+        "id": "middle-left",
+        "shelf": "middle",
+        "side": "left",
+        "label": "Middle - Left",
+        "weekly_pence": 14400
+      },
+      {
+        "id": "middle-right",
+        "shelf": "middle",
+        "side": "right",
+        "label": "Middle - Right",
+        "weekly_pence": 14400
+      },
+      {
+        "id": "bottom-left",
+        "shelf": "bottom",
+        "side": "left",
+        "label": "Bottom - Left",
+        "weekly_pence": 12000
+      },
+      {
+        "id": "bottom-right",
+        "shelf": "bottom",
+        "side": "right",
+        "label": "Bottom - Right",
+        "weekly_pence": 12000
+      }
+    ]
+  },
+  {
+    "id": "bham-02",
+    "name": "Canalside Welcome",
+    "city": "Birmingham",
+    "area": "Brindleyplace",
+    "type": "Hotel lobby",
+    "lat": 52.477,
+    "lng": -1.914,
+    "audiences": [
+      "Travellers",
+      "Leisure visitors"
+    ],
+    "descriptors": null,
+    "weekly_footfall": 6100,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-single",
+    "stand_id": "bham-02-stand-01",
+    "facings": [
+      {
+        "id": "top-centre",
+        "shelf": "top",
+        "side": "centre",
+        "label": "Top",
+        "weekly_pence": 14000
+      },
+      {
+        "id": "middle-centre",
+        "shelf": "middle",
+        "side": "centre",
+        "label": "Middle",
+        "weekly_pence": 12000
+      },
+      {
+        "id": "bottom-centre",
+        "shelf": "bottom",
+        "side": "centre",
+        "label": "Bottom",
+        "weekly_pence": 10000
+      }
+    ]
+  },
+  {
+    "id": "bham-03",
+    "name": "University Quarter Hub",
+    "city": "Birmingham",
+    "area": "Edgbaston",
+    "type": "Student hub",
+    "lat": 52.451,
+    "lng": -1.93,
+    "audiences": [
+      "Students"
+    ],
+    "descriptors": [
+      "Campus community"
+    ],
+    "weekly_footfall": null,
+    "footfall_date": null,
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-single",
+    "stand_id": "bham-03-stand-01",
+    "facings": [
+      {
+        "id": "top-centre",
+        "shelf": "top",
+        "side": "centre",
+        "label": "Top",
+        "weekly_pence": 11200
+      },
+      {
+        "id": "middle-centre",
+        "shelf": "middle",
+        "side": "centre",
+        "label": "Middle",
+        "weekly_pence": 9600
+      },
+      {
+        "id": "bottom-centre",
+        "shelf": "bottom",
+        "side": "centre",
+        "label": "Bottom",
+        "weekly_pence": 8000
+      }
+    ]
+  },
+  {
+    "id": "mcr-01",
+    "name": "Spinningfields Exchange",
+    "city": "Manchester",
+    "area": "Spinningfields",
+    "type": "Office lobby",
+    "lat": 53.48,
+    "lng": -2.251,
+    "audiences": [
+      "Office professionals",
+      "Commuters"
+    ],
+    "descriptors": [
+      "Business visitors"
+    ],
+    "weekly_footfall": 11200,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-dual",
+    "stand_id": "mcr-01-stand-01",
+    "facings": [
+      {
+        "id": "top-left",
+        "shelf": "top",
+        "side": "left",
+        "label": "Top - Left",
+        "weekly_pence": 22400
+      },
+      {
+        "id": "top-right",
+        "shelf": "top",
+        "side": "right",
+        "label": "Top - Right",
+        "weekly_pence": 22400
+      },
+      {
+        "id": "middle-left",
+        "shelf": "middle",
+        "side": "left",
+        "label": "Middle - Left",
+        "weekly_pence": 19200
+      },
+      {
+        "id": "middle-right",
+        "shelf": "middle",
+        "side": "right",
+        "label": "Middle - Right",
+        "weekly_pence": 19200
+      },
+      {
+        "id": "bottom-left",
+        "shelf": "bottom",
+        "side": "left",
+        "label": "Bottom - Left",
+        "weekly_pence": 16000
+      },
+      {
+        "id": "bottom-right",
+        "shelf": "bottom",
+        "side": "right",
+        "label": "Bottom - Right",
+        "weekly_pence": 16000
+      }
+    ]
+  },
+  {
+    "id": "mcr-02",
+    "name": "Northern Quarter Rooms",
+    "city": "Manchester",
+    "area": "Northern Quarter",
+    "type": "Hotel lobby",
+    "lat": 53.485,
+    "lng": -2.234,
+    "audiences": [
+      "Travellers",
+      "Leisure visitors"
+    ],
+    "descriptors": null,
+    "weekly_footfall": 7400,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-single",
+    "stand_id": "mcr-02-stand-01",
+    "facings": [
+      {
+        "id": "top-centre",
+        "shelf": "top",
+        "side": "centre",
+        "label": "Top",
+        "weekly_pence": 15400
+      },
+      {
+        "id": "middle-centre",
+        "shelf": "middle",
+        "side": "centre",
+        "label": "Middle",
+        "weekly_pence": 13200
+      },
+      {
+        "id": "bottom-centre",
+        "shelf": "bottom",
+        "side": "centre",
+        "label": "Bottom",
+        "weekly_pence": 11000
+      }
+    ]
+  },
+  {
+    "id": "mcr-03",
+    "name": "Oxford Road Collective",
+    "city": "Manchester",
+    "area": "Oxford Road",
+    "type": "Community venue",
+    "lat": 53.467,
+    "lng": -2.235,
+    "audiences": null,
+    "descriptors": null,
+    "weekly_footfall": 5600,
+    "footfall_date": "2026-11-01",
+    "provenance": "Illustrative fixture, not measured venue data",
+    "audience_source": "Synthetic demo tags, not verified demographic research",
+    "stand_model": "totem-dual",
+    "stand_id": "mcr-03-stand-01",
+    "facings": [
+      {
+        "id": "top-left",
+        "shelf": "top",
+        "side": "left",
+        "label": "Top - Left",
+        "weekly_pence": 12600
+      },
+      {
+        "id": "top-right",
+        "shelf": "top",
+        "side": "right",
+        "label": "Top - Right",
+        "weekly_pence": 12600
+      },
+      {
+        "id": "middle-left",
+        "shelf": "middle",
+        "side": "left",
+        "label": "Middle - Left",
+        "weekly_pence": 10800
+      },
+      {
+        "id": "middle-right",
+        "shelf": "middle",
+        "side": "right",
+        "label": "Middle - Right",
+        "weekly_pence": 10800
+      },
+      {
+        "id": "bottom-left",
+        "shelf": "bottom",
+        "side": "left",
+        "label": "Bottom - Left",
+        "weekly_pence": 9000
+      },
+      {
+        "id": "bottom-right",
+        "shelf": "bottom",
+        "side": "right",
+        "label": "Bottom - Right",
+        "weekly_pence": 9000
+      }
+    ]
+  }
+]

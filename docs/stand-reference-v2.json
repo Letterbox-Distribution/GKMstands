@@ -1,0 +1,25 @@
+{
+  "status": "Image-derived concept; not fabrication dimensions",
+  "width_mm": 1340,
+  "height_mm": 1860,
+  "base_depth_mm": 380,
+  "rack_width_mm": 1260,
+  "screen_width_mm": 480,
+  "screen_height_mm": 750,
+  "shelf_levels_mm": {
+    "top": 870,
+    "middle": 550,
+    "bottom": 230
+  },
+  "paper_mm": {
+    "A4": [
+      210,
+      297
+    ],
+    "A5": [
+      148,
+      210
+    ]
+  },
+  "source": "Owner-selected GoldKey airport-lounge concept"
+}

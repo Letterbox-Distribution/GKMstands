@@ -1,0 +1,20 @@
+{
+  "name": "goldkey-select",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/core.test.mjs",
+    "test:browser": "node tests/browser.cjs",
+    "test:stand": "node tests/stand.cjs",
+    "test:stand-layout": "node tests/stand-layout.cjs",
+    "test:video": "node tests/video-loop.cjs",
+    "test:recommendations": "node --test tests/recommendations.test.mjs",
+    "test:map": "node tests/map-explorer.cjs",
+    "test:flow": "node tests/clear-flow.cjs",
+    "test:hero": "node tests/hero-loading.cjs",
+    "test:entry": "node tests/entry-loading.cjs",
+    "test:cache": "python -m unittest discover -s tests -p cache_headers_test.py"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}

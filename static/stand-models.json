@@ -1,0 +1,23 @@
+{
+  "id": "totem-reference-v1",
+  "label": "Screen and magazine Totem",
+  "width": 1.32,
+  "height": 2.4,
+  "baseDepth": 0.48,
+  "rackWidth": 1.26,
+  "shelfHeights": {
+    "top": 1.11,
+    "middle": 0.76,
+    "bottom": 0.41
+  },
+  "shelfTilt": 0.4,
+  "holdersPerShelf": 6,
+  "screenWidth": 0.615,
+  "screenHeight": 1.06,
+  "sampleCover": "/static/artwork/lidl-bromley-cross-front.png",
+  "source": "Concept sized for 12 A4 magazines and six A5 leaflet pockets. 12 mm gaps between columns. Allowances and frame geometry require fabrication review; not a manufacturing drawing.",
+  "paperSizes": {
+    "outer": "A4 210 \u00c3\u2014 297 mm",
+    "central": "A5 148 \u00c3\u2014 210 mm"
+  }
+}
