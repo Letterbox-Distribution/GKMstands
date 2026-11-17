@@ -139,7 +139,7 @@
 .booking-map-pin{border:0;background:none}
 .booking-map-pin span{width:29px;height:29px;display:grid;place-items:center;background:#8a6549;color:#fff;border:2px solid #fff;box-shadow:0 2px 8px #302b2740;border-radius:50% 50% 50% 3px;transform:rotate(-45deg)}
 .booking-map-pin b{font:600 12px/1 Manrope,sans-serif;transform:rotate(45deg)}
-.booking-map-pin.is-selected span{background:#4f3320;box-shadow:0 0 0 3px #b9977980,0 2px 8px #302b2740}
+.booking-map-pin.is-selected span,.booking-map-pin.is-focused span{background:#4f3320;box-shadow:0 0 0 3px #b9977980,0 2px 8px #302b2740}
 .booking-inventory-note{font-size:12px;line-height:1.7;color:#aa9684;max-width:820px;margin:25px 0 0}
 .booking-review-line{display:grid;grid-template-columns:94px minmax(0,1fr) auto;gap:20px;align-items:center;padding:20px 0;border-bottom:1px solid #e4d8ce}
 .booking-review-line>img{width:94px;height:76px;object-fit:cover;border-radius:2px}

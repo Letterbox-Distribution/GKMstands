@@ -103,7 +103,7 @@ function renderDiscovery(refit=false){
 }
 $('#locations-step').addEventListener('click',event=>{
  const city=event.target.closest('[data-filter-city]');if(city){cityFilter=city.dataset.filterCity;renderDiscovery(true);return;}
- const open=event.target.closest('[data-open-venue]');if(open){expandedVenue=expandedVenue===open.dataset.openVenue?'':open.dataset.openVenue;renderDiscovery();document.querySelector('[data-open-venue="'+open.dataset.openVenue+'"]').focus({preventScroll:true});return;}
+ const open=event.target.closest('[data-open-venue]');if(open){expandedVenue=expandedVenue===open.dataset.openVenue?'':open.dataset.openVenue;if(expandedVenue)focusedVenue=expandedVenue;renderDiscovery();if(expandedVenue)focusVenueOnMap(expandedVenue);document.querySelector('[data-open-venue="'+open.dataset.openVenue+'"]').focus({preventScroll:true});return;}
  const choice=event.target.closest('[data-select-space]');if(choice){
   const {selectVenue:venue_id,selectSpace:slot_id}=choice.dataset,index=state.placements.findIndex(item=>item.venue_id===venue_id&&item.slot_id===slot_id);
   if(index>=0)state.placements.splice(index,1);else state.placements.push({venue_id,slot_id});
@@ -140,6 +140,14 @@ async function ensureMap(){
   L.control.scale({imperial:false}).addTo(map);updateMap(true);
  })();return mapPromise;
 }
+async function focusVenueOnMap(id){
+ const venue=venues.find(item=>item.id===id);if(!venue)return;
+ if(matchMedia('(max-width:760px)').matches&&!$('#booking-map-panel').classList.contains('is-open'))return;
+ await ensureMap();if(!map||focusedVenue!==id)return;
+ map.invalidateSize();map.stop();map.setView([venue.lat,venue.lng],15,{animate:!reduced,duration:.5});
+ $('#booking-map').setAttribute('aria-label','Map centred on '+venue.name);
+ updateMap();
+}
 function updateMap(refit=false){
  if(!map)return;markers.forEach(marker=>marker.remove());markers=[];const available=visibleVenues();
  if(map.getZoom()<10&&new Set(available.map(venue=>venue.city)).size>1){
@@ -150,13 +158,13 @@ function updateMap(refit=false){
   }
  }else for(const venue of available){
   const number=venues.indexOf(venue)+1,selected=selectedAt(venue).length;
-  const marker=L.marker([venue.lat,venue.lng],{title:'Location '+number+': '+venue.name,keyboard:true,icon:L.divIcon({className:'booking-map-pin'+(selected?' is-selected':''),iconSize:[30,34],iconAnchor:[15,32],html:'<span><b>'+number+'</b></span>'})}).addTo(map);
+  const marker=L.marker([venue.lat,venue.lng],{title:'Location '+number+': '+venue.name,keyboard:true,icon:L.divIcon({className:'booking-map-pin'+(selected?' is-selected':'')+(focusedVenue===venue.id?' is-focused':''),iconSize:[30,34],iconAnchor:[15,32],html:'<span><b>'+number+'</b></span>'})}).addTo(map);
   marker.bindTooltip('Location '+number+' · '+esc(venue.name),{direction:'top',offset:[0,-26]});
   marker.on('click',()=>{expandedVenue=venue.id;focusedVenue=venue.id;renderDiscovery();const card=$('#venue-'+venue.id);card.scrollIntoView({behavior:reduced?'instant':'smooth',block:'nearest'});card.querySelector('[data-open-venue]').focus({preventScroll:true});});markers.push(marker);
  }
  if(refit&&available.length)map.fitBounds(available.map(venue=>[venue.lat,venue.lng]),{padding:[35,35],maxZoom:13,animate:false});
 }
-$('#booking-map-toggle').addEventListener('click',async()=>{const panel=$('#booking-map-panel'),open=panel.classList.toggle('is-open');$('#booking-map-toggle').textContent=open?'Hide map':'Show map';$('#booking-map-toggle').setAttribute('aria-expanded',String(open));if(open){await ensureMap();map?.invalidateSize();updateMap(true);}});
+$('#booking-map-toggle').addEventListener('click',async()=>{const panel=$('#booking-map-panel'),open=panel.classList.toggle('is-open');$('#booking-map-toggle').textContent=open?'Hide map':'Show map';$('#booking-map-toggle').setAttribute('aria-expanded',String(open));if(open){await ensureMap();map?.invalidateSize();if(focusedVenue)await focusVenueOnMap(focusedVenue);else updateMap(true);}});
 
 $('#booking-artwork').addEventListener('change',async event=>{
  const file=event.target.files[0];if(!file)return;

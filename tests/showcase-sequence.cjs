@@ -16,7 +16,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
     await page.evaluate(progress=>{const root=document.querySelector('#showcase');scrollTo({top:(root.offsetHeight-root.querySelector('.showcase-stage').offsetHeight)*progress,behavior:'instant'});},progress);
     await page.waitForFunction(progress=>Math.abs(Number(document.querySelector('#showcase').dataset.renderProgress)-progress)<.006,progress);
    };
-   for(const progress of [.8,.12,.66,.26,.91])await seek(progress);
+   for(const progress of [.8,.12,.66,.26,.91]){await seek(progress);const dimensions=await page.locator('#showcase-viewport canvas').evaluate(c=>[Number(c.dataset.sequenceSourceWidth),Number(c.dataset.sequenceSourceHeight)]);assert.deepEqual(dimensions,width<=760?[780,1824]:[2880,1820],'motion frame must retain native resolution');}
    await page.waitForFunction(()=>document.querySelector('#showcase-viewport canvas').dataset.sequenceQuality==='full');
    assert(Number(await page.locator('#showcase-viewport canvas').getAttribute('data-sequence-cache-bytes'))<=72*1024*1024);
    assert.equal(await page.locator('.native-screen-layer').isVisible(),false);
