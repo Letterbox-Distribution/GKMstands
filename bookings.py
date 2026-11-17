@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import secrets
 import sqlite3
+import tempfile
 from datetime import date, datetime, timezone
 
 import click
@@ -35,7 +36,9 @@ def booking_inventory(venues):
 
 
 def register_booking_routes(app, load_venues):
-    app.config.setdefault('BOOKING_DB', os.environ.get('GKM_BOOKING_DB', str(Path(app.instance_path) / 'booking-requests.sqlite3')))
+    # Vercel's application directory is read-only; demo data lives in temporary storage.
+    database_root = Path(tempfile.gettempdir()) / 'goldkey-demo' if os.environ.get('VERCEL') else Path(app.instance_path)
+    app.config.setdefault('BOOKING_DB', os.environ.get('GKM_BOOKING_DB', str(database_root / 'booking-requests.sqlite3')))
     app.config['MAX_CONTENT_LENGTH'] = 11 * 1024 * 1024
     signer = URLSafeTimedSerializer(os.environ.get('GKM_SECRET_KEY') or secrets.token_hex(32), salt='booking-form')
 
