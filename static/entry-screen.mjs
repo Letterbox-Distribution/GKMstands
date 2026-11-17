@@ -1,5 +1,7 @@
 ﻿const entry=document.getElementById('site-entry'),hero=document.getElementById('showcase');
-if(entry&&hero){
+if(entry&&hero&&document.documentElement.dataset.entrySkip==='true'){
+ entry.remove();document.body.dataset.entryRevealReady='true';document.body.dataset.entryReady='true';document.body.dataset.entryRender='skipped';dispatchEvent(new Event('entry-reveal-complete'));dispatchEvent(new Event('entry-complete'));
+}else if(entry&&hero){
  const previous=[...document.body.children].filter(el=>el!==entry&&el.tagName!=='SCRIPT').map(el=>[el,el.inert]);previous.forEach(([el])=>el.inert=true);entry.focus({preventScroll:true});
  const minimum=(async()=>{
   const logo=new Image();logo.src='/static/goldkey-select.png';
@@ -14,6 +16,6 @@ if(entry&&hero){
  const openingReady=opening?.decode().catch(()=>{})??Promise.resolve();
  Promise.all([minimum,openingReady]).then(()=>{
   entry.setAttribute('aria-busy','false');entry.classList.add('is-complete');
-  setTimeout(()=>{document.body.dataset.entryRender=hero.dataset.ready==='true'?'live':'cached-opening';performance.mark('entry-complete');document.documentElement.classList.remove('entry-loading');previous.forEach(([el,value])=>el.inert=value);entry.remove();document.body.dataset.entryReady='true';dispatchEvent(new Event('entry-complete'));},matchMedia('(prefers-reduced-motion:reduce)').matches?170:330);
+  setTimeout(()=>{document.body.dataset.entryRender=hero.dataset.ready==='true'?'live':'cached-opening';performance.mark('entry-complete');document.documentElement.classList.remove('entry-loading');previous.forEach(([el,value])=>el.inert=value);entry.remove();try{sessionStorage.setItem('goldkey-entry-seen','true');}catch{}document.body.dataset.entryReady='true';dispatchEvent(new Event('entry-complete'));},matchMedia('(prefers-reduced-motion:reduce)').matches?170:330);
  });
 }

@@ -6,10 +6,10 @@ export function createNativeScreen(host,source,hdSource){
  const video=document.createElement('video');video.className='native-screen-video';video.muted=true;video.defaultMuted=true;video.loop=true;video.playsInline=true;video.preload='auto';video.width=720;video.height=1280;layer.append(video);host.append(layer);
  let wanted=false,disposed=false,surfaceWidth=720,surfaceHeight=1280,lastPoints,lastClip,attemptedFallback=false;
  const reveal=()=>{if(video.readyState>=2)video.style.opacity='1';};video.addEventListener('loadeddata',reveal);
- const begin=selected=>{if(disposed)return;video.src=assetUrl(selected);video.dataset.quality=selected===hdSource?'1080p':'720p';if(wanted)video.play().catch(()=>{});};
+ const begin=selected=>{if(disposed)return;video.style.opacity='0';video.src=assetUrl(selected);video.dataset.quality=selected===hdSource?'1080p':'720p';if(wanted)video.play().catch(()=>{});};
  (async()=>{
   const connection=navigator.connection;
-  if(!hdSource||connection?.saveData||['slow-2g','2g','3g'].includes(connection?.effectiveType)||!navigator.mediaCapabilities?.decodingInfo){begin(source);return;}
+  if(!hdSource||connection?.saveData||(connection?.downlink&&connection.downlink<5)||['slow-2g','2g','3g'].includes(connection?.effectiveType)||!navigator.mediaCapabilities?.decodingInfo){begin(source);return;}
   try{
    const capabilities=await Promise.race([
     navigator.mediaCapabilities.decodingInfo({type:'file',video:{contentType:'video/mp4; codecs="avc1.640028"',width:1080,height:1920,bitrate:2200000,framerate:30}}),

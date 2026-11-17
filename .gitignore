@@ -5,3 +5,6 @@ config.local.json
 node_modules/
 test-results/
 .qa/
+
+# Private booking requests and optional customer artwork
+instance/

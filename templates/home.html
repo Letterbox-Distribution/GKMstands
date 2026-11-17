@@ -1,0 +1,38 @@
+{% extends 'edition-base.html' %}
+{% block body_class %}edition-home{% endblock %}
+{% block head %}
+  <script>let firstEntry=true;try{firstEntry=sessionStorage.getItem('goldkey-entry-seen')!=='true';}catch{}if(firstEntry)document.documentElement.classList.add('entry-loading');else document.documentElement.dataset.entrySkip='true';if(!location.hash){history.scrollRestoration='manual';scrollTo(0,0);}</script>
+  <link rel="modulepreload" href="/static/showcase-worker-controller.mjs"><link rel="modulepreload" href="/static/entry-screen.mjs">
+  <link rel="preload" as="image" href="/static/environments/instant-panorama-mobile.webp" media="(max-width:760px)" fetchpriority="high">
+  <link rel="preload" as="image" href="/static/environments/instant-panorama-desktop.webp" media="(min-width:761px)" fetchpriority="high">
+{% endblock %}
+{% block entry %}{% include 'entry-screen.html' %}{% endblock %}
+{% block content %}
+  {% include 'showcase.html' %}
+  <section id="editorial-setting" class="clients-section edition-container" aria-labelledby="editorial-title">
+    <div class="clients-heading"><h2 id="editorial-title">Clients</h2><p>Fashion. Design. Travel. Wellbeing.</p></div>
+    <ul id="client-logos" class="client-logos" aria-label="Magazine titles"></ul>
+    <p class="clients-note">A selection of magazine titles. The magazine mix varies by location.</p>
+  </section>
+  <section id="about" class="edition-story edition-container" aria-labelledby="about-title">
+    <div class="edition-story-copy" data-reveal>
+      <h2 id="about-title">A world of connections.<br>A place for your brand.</h2>
+      <p>Gold Key Media connects publishers, brands and premium venues through specialist media placement.</p>
+      <p>Edition brings that expertise to your A5 campaign.</p>
+      <a class="edition-text-link" href="https://www.gkml.co.uk/about-us/" target="_blank" rel="noopener noreferrer">Meet Gold Key Media <span aria-hidden="true">↗</span></a>
+    </div>
+    <figure data-reveal><picture><source media="(max-width:760px)" srcset="/static/editorial/hotel-editorial-600.webp"><img src="/static/editorial/hotel-editorial-1100.webp" width="1100" height="1375" loading="lazy" decoding="async" alt="An illustrative hotel lounge with magazines arranged on a walnut console"></picture><figcaption>A considered setting.</figcaption></figure>
+  </section>
+  <section id="the-service" class="edition-story edition-story--reverse edition-container" aria-labelledby="service-title">
+    <figure data-reveal><picture><source media="(max-width:760px)" srcset="/static/editorial/a5-editorial-600.webp"><img src="/static/editorial/a5-editorial-1100.webp" width="1100" height="1375" loading="lazy" decoding="async" alt="Premium A5 leaflets in a clear holder beside a stack of magazines on a walnut console"></picture></figure>
+    <div class="edition-story-copy" data-reveal>
+      <h2 id="service-title">Small format.<br>Considered impact.</h2>
+      <p>Your A5 leaflet, presented alongside established magazine titles in carefully chosen settings.</p>
+      <ul class="edition-feature-list"><li>Six central A5 spaces</li><li>Choose the locations that suit your campaign</li><li>Plan a placement by the week</li></ul>
+      <a href="/plan" class="edition-button">Plan your campaign <span aria-hidden="true">↗</span></a>
+      <p class="edition-reassurance">Choose your places. We confirm the details.</p>
+    </div>
+  </section>
+  <section class="edition-next" aria-labelledby="next-title"><div class="edition-container"><h2 id="next-title" data-reveal>Your next chapter starts here.</h2><a href="/plan" class="edition-button edition-button--outline">Plan your campaign <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/entry-screen.mjs"></script><script type="module" src="/static/showcase.mjs"></script><script type="module" src="/static/home.mjs"></script>{% endblock %}

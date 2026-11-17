@@ -22,7 +22,7 @@ export function createArchitecturalSetting(view){
      float depth=ground?settingWorldPosition.z+.34:0.;
      float perspective=max(.15,1.-depth/6.);
      vec2 uv=vec2(.50+settingWorldPosition.x/(4.7*perspective),1.-.787+((settingWorldPosition.y-1.3)/perspective+1.3)/(4.7/venueAspect));
-     float edge=max(max(smoothstep(.94,1.04,uv.y),smoothstep(.97,1.02,uv.x)),1.-smoothstep(-.02,.06,uv.x));
+     float edge=max(max(smoothstep(.94,1.04,uv.y),smoothstep(.97,1.02,uv.x)),max(1.-smoothstep(-.02,.06,uv.x),1.-smoothstep(-.03,.045,uv.y)));
      vec3 room=mix(texture2D(venueTexture,clamp(uv,vec2(.001),vec2(.999))).rgb,vec3(1.),edge);
      room*=mix(.86,1.,getShadowMask());
      gl_FragColor.rgb=mix(gl_FragColor.rgb,linearToOutputTexel(vec4(room,1.)).rgb,venueMix);

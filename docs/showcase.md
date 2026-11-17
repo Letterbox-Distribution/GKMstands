@@ -169,3 +169,12 @@ Run `node scripts/build-asset-versions.cjs` after changing the covered magazine 
 Rendering keeps geometry/texture duplicates shared, reuses the fixed shadow map and changes framebuffer resolution only at movement/idle boundaries. Full quality returns after scrolling. The native advert continues to use browser video decoding/compositing and buffers during entry. Venue photography is warmed after the first hero frame at idle, rather than blocking entry or first scroll.
 
 Validation: `npm run test:hero`, `npm run test:video`, `npm run test:entry`, `npm run test:cache`. Cold GPU compilation remains device dependent; browser asset caching and baked lighting remove repeat work but do not persist a live WebGL context through a full page refresh.
+
+
+### Current room material and HD advert
+
+The live hotel is now blended directly into the opening wall/floor material, using the same world-space projection and shadow map. There is no second background scene, sliding photo plane or transparent wall overlay. The original reveal strips fade before the room takes over; the stand's lighting warms gently with the room. Existing entry/hold/exit timing and the retained hotel asset remain.
+
+The native video layer selects `goldkey-advert-cinematic-hd.mp4` (1080?1920 at 30fps) only when the browser reports smooth, efficient decoding and connection settings allow it. Original 720p playback remains available for data-saver/slow connections or inefficient/unsupported decoding, and for the main-thread compatibility renderer. The video element and homography use actual decoded dimensions. `goldkey-advert-cinematic-hd-poster.webp` supplies the sharper worker poster. Both streams use browser decoding independently of stand rendering.
+
+Re-render with `node scripts/render-advert-hd.cjs` (local server running; set FFMPEG_PATH if the temporary imageio encoder is unavailable), then run `node scripts/build-asset-versions.cjs`. Full HD creative preserves the original logical layout, lighting, colours, text timing and 18-second loop. Test the HD path with ADVERT_HD=1 when running tests/video-loop.cjs.

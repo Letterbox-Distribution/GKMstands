@@ -1,0 +1,31 @@
+{% from 'edition-brand.html' import brand %}
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GoldKey Edition. Premium A5 leaflet placement, thoughtfully presented alongside established magazine titles.">
+  <title>{% block title %}GoldKey Edition — A place for your brand{% endblock %}</title>
+  <link rel="icon" href="data:,"><link rel="stylesheet" href="{{ showcase_styles }}">
+  <link rel="preload" as="image" href="/static/goldkey-select.png"><link rel="preload" as="font" href="{{ font_url }}" type="font/woff2" crossorigin>
+  {% block head %}{% endblock %}
+</head>
+<body class="showcase-enabled {% block body_class %}{% endblock %}">
+  {% block entry %}{% endblock %}
+  <a class="skip" href="#main-content">Skip to content</a>
+  <header class="header">
+    <a class="wordmark" href="/" aria-label="GoldKey Edition home">{{ brand('header') }}</a>
+    <nav aria-label="Main">
+      {% if home %}<button class="text-button" id="open-stand" type="button">The stand</button>{% else %}<a href="/#showcase">The stand</a>{% endif %}
+      <a href="{{ '#about' if home else '/#about' }}" class="nav-secondary">About</a>
+      <a href="/plan" class="nav-start"{% if not home %} aria-current="page"{% endif %}>Plan your campaign</a>
+    </nav>
+  </header>
+  <main id="main-content">{% block content %}{% endblock %}</main>
+  <footer class="footer edition-footer edition-container">
+    <a class="wordmark" href="/" aria-label="GoldKey Edition home">{{ brand('footer') }}</a>
+    <nav aria-label="Footer"><a href="/#about">Gold Key Media</a><a href="/#the-service">The service</a><a href="/plan">Plan your campaign</a></nav>
+    <small>Thoughtfully placed. Expertly connected.</small>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

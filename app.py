@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request, make_response
+from bookings import register_booking_routes, booking_inventory
 ROOT = Path(__file__).parent
 app = Flask(__name__)
 app.config.update(TEMPLATES_AUTO_RELOAD=True, SEND_FILE_MAX_AGE_DEFAULT=0)
@@ -25,7 +26,7 @@ STYLE_FILES = (
     'vendor/fonts.css', 'style.css', 'premium.css', 'map-workspace.css',
     'friendly.css', 'one-page.css', 'sections.css', 'location-explorer.css',
     'luxury.css', 'guided-placement.css', 'client-logos.css', 'clear-flow.css',
-    'venue-photos.css', 'planner-polish.css', 'entry-screen.css', 'showcase.css',
+    'venue-photos.css', 'planner-polish.css', 'entry-screen.css', 'showcase.css', 'edition-pages.css',
 )
 STYLE_BUNDLES = {}
 
@@ -59,6 +60,8 @@ def showcase_styles(digest):
 
 @app.after_request
 def cache_static(response):
+    if request.path.startswith('/api/booking-requests'):
+        response.headers['Cache-Control'] = 'no-store'
     if request.endpoint != 'static':
         return response
     filename = request.view_args.get('filename', '')
@@ -86,11 +89,28 @@ def map_key():
     config = ROOT / 'config.local.json'
     local = json.loads(config.read_text()) if config.exists() else {}
     return os.environ.get('OS_MAPS_API_KEY', local.get('OS_MAPS_API_KEY', ''))
+def load_venues():
+    return json.loads((ROOT / 'data/venues.json').read_text(encoding='utf-8'))
+
+booking_form_token = register_booking_routes(app, lambda: booking_inventory(load_venues()))
+
+def edition_context():
+    return {'showcase_styles': current_style_bundle(), 'font_url': versioned_asset('vendor/manrope-0.woff2')}
+
 @app.get('/')
 def index():
-    venues = json.loads((ROOT / 'data/venues.json').read_text(encoding='utf-8'))
     showcase = request.args.get('view', os.environ.get('GKM_HOME_VIEW', 'showcase')) != 'original'
-    return render_template('index.html', venues=venues, os_key=map_key(), showcase=showcase, showcase_styles=current_style_bundle() if showcase else None, font_url=versioned_asset('vendor/manrope-0.woff2'))
+    if showcase:
+        return render_template('home.html', home=True, campaign_url='/plan', **edition_context())
+    return render_template('index.html', venues=load_venues(), os_key=map_key(), showcase=False, **edition_context())
+
+@app.get('/plan')
+@app.get('/booking')
+def plan_campaign():
+    response = make_response(render_template('booking.html', home=False, venues=booking_inventory(load_venues()), os_key=map_key(), booking_token=booking_form_token(), **edition_context()))
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
 @app.get('/api/venues')
 def inventory():
     return jsonify(json.loads((ROOT / 'data/venues.json').read_text(encoding='utf-8')))

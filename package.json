@@ -12,7 +12,8 @@
     "test:flow": "node tests/clear-flow.cjs",
     "test:hero": "node tests/hero-loading.cjs",
     "test:entry": "node tests/entry-loading.cjs",
-    "test:cache": "python -m unittest discover -s tests -p cache_headers_test.py"
+    "test:cache": "python -m unittest discover -s tests -p cache_headers_test.py",
+    "test:booking": "python -m unittest discover -s tests -p booking_requests_test.py"
   },
   "devDependencies": {
     "playwright": "1.65.1"
