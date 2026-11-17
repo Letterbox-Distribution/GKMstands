@@ -55,3 +55,8 @@ The Browser plugin was unavailable; verification used installed Playwright with 
 Eight settled viewport comparisons (four progress positions on each viewport) had mean absolute channel differences of 0.68 to 2.05 on the 0-255 scale. See `showcase-visual-check-2026-11-17.json`. Full-quality frame indices were checked before capture; the visible stand geometry, framing and artwork matched.
 
 Follow-up: location cards now centre and highlight their venue on the booking map, including a deferred map opened on mobile. `node tests/booking-map-focus.cjs` verifies two locations on both layouts. Native-resolution scrolling is asserted in `test:sequence`; thumbnails are rejected by the player.
+
+
+## Continuous camera path
+
+`static/showcase-motion.mjs` is the shared camera choreography for both the worker and compatibility renderer. The viewing angle advances continuously across the full scroll range, including the final A5 view. Zoom approaches the existing maximum with zero terminal velocity rather than being abruptly clamped mid-movement. Scroll input uses a short 55 ms easing response; it does not autoplay when the visitor stops scrolling. The cached frames are captured from the same path. `node tests/showcase-motion.test.mjs` checks uninterrupted angular movement, a non-reversing zoom and the original final size/angle.

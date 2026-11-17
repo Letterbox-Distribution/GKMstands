@@ -1,8 +1,11 @@
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const path=require('node:path');
+const fs=require('node:fs');
 const base=process.env.BASE_URL||'http://127.0.0.1:5001';
 (async()=>{
+ const manifest=JSON.parse(fs.readFileSync(path.resolve('static/showcase-sequence/manifest.json'),'utf8'));
+ for(const variant of Object.values(manifest.variants))for(let i=1;i<variant.frames.length;i++)assert(Number(variant.frames[i].camera)>Number(variant.frames[i-1].camera),'captured camera must keep moving between chapters');
  const browser=await chromium.launch({channel:'chrome',headless:true});
  try{
   for(const width of [390,1440]){
