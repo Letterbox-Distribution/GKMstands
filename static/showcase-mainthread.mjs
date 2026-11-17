@@ -43,7 +43,7 @@ const screenButton=document.createElement('button');screenButton.type='button';s
 function syncPlayback(){if(!screenVideo||!presented)return;const rect=host.getBoundingClientRect();const play=visible&&rect.bottom>0&&rect.top<innerHeight&&!document.hidden&&(!reduced||videoOptIn)&&!userPaused;if(play&&screenVideo.paused)screenVideo.play().catch(()=>{screenButton.textContent='Play screen video';});else if(!play&&!screenVideo.paused)screenVideo.pause();screenButton.textContent=play?'Pause screen video':'Play screen video';screenButton.setAttribute('aria-pressed',String(play));}
 screenButton.addEventListener('click',()=>{userPaused=!screenVideo?.paused;if(reduced)videoOptIn=true;syncPlayback();});
 
-const motionButton=document.createElement('button');motionButton.type='button';motionButton.className='showcase-motion';root.querySelector('.showcase-bottom').append(motionButton);
+const motionButton=document.createElement('button');motionButton.type='button';motionButton.className='showcase-motion';
 function syncMotion(){syncPlayback();root.classList.toggle('showcase-reduced',reduced);motionButton.textContent=reduced?'Enable scroll animation':'Reduce motion';motionButton.setAttribute('aria-pressed',String(!reduced));}
 motionButton.addEventListener('click',()=>{reduced=!reduced;syncMotion();measure();});preference.addEventListener('change',()=>{reduced=preference.matches;syncMotion();measure();});syncMotion();
 root.querySelector('#showcase-artwork').addEventListener('click',()=>root.querySelector('#showcase-file').click());

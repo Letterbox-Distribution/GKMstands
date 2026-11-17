@@ -24,7 +24,7 @@ const path=require('node:path');
   await page.locator('[data-go="3"]').click();await page.waitForFunction(()=>Number(document.querySelector('#showcase')?.dataset.renderProgress)>.86);
   await page.locator('[data-pocket="5"]').click();await page.waitForFunction(()=>document.querySelector('#showcase-viewport canvas').dataset.selectedSlot==='bottom-3');
   await page.locator('#showcase-file').setInputFiles(path.resolve('static/artwork/your-edition.png'));await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.artwork==='custom');
-  await page.locator('[data-chapter="3"] a[href="/plan"]').click();await page.waitForFunction(()=>document.body?.dataset.bookingReady==='true');
+  await page.locator('.header .nav-start').click();await page.waitForFunction(()=>document.body?.dataset.bookingReady==='true');
   assert.equal(await page.locator('#showcase').count(),0,'booking should not load a second hero');
   await page.locator('.header a[href="/#showcase"]').click();await page.waitForFunction(()=>document.body?.dataset.entryReady==='true');
   await page.locator('#open-stand').click();await page.waitForFunction(()=>Math.abs(Number(document.querySelector('#showcase')?.dataset.renderProgress)-.55)<.01);
