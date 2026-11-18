@@ -24,7 +24,9 @@ Text, controls, booking logic, uploaded artwork and advert content remain editab
 
 ## Loading, resolution and memory
 
-Motion and settled frames retain the same 2x dimensions; motion never substitutes a thumbnail. A high-quality WebP replaces a settled video pose. The motion files are approximately 23.2 MiB desktop and 7.7 MiB mobile. The browser can progressively buffer the movie and may preload the remaining data; first display does not require the entire file. The reverse direction uses the same seekable movie.
+The encoder converts the WebP decoder's limited-range BT.601 YUV to limited-range BT.709 without compressing the luminance range a second time. This keeps white backgrounds and stand colours consistent between moving video and settled WebP frames.
+
+Motion and settled frames retain the same 2x dimensions; motion never substitutes a thumbnail. A high-quality WebP replaces a settled video pose. The motion files are approximately 25.1 MiB desktop and 8.4 MiB mobile. The browser can progressively buffer the movie and may preload the remaining data; first display does not require the entire file. The reverse direction uses the same seekable movie.
 
 Normal scrolling no longer fetches and decodes a series of individual WebPs. One pinned motion frame is retained at a time and closed when replaced. Native video buffering is browser managed. The separate decoded WebP fallback cache remains bounded at 72 MiB, with an 8 MiB compressed prefetch cache. Those limits exclude browser media buffers, the drawing canvas and GPU allocations.
 
@@ -33,6 +35,7 @@ Navigation closes pinned frames, disposes the decoder and terminates any live wo
 ## Verification
 
 ```
+node tests/showcase-background.cjs
 node tests/showcase-wheel.cjs
 npm run test:sequence
 npm run test:hero

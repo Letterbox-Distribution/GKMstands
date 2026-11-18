@@ -18,12 +18,13 @@ def encode_motion(folder, capture):
     frames = [folder / frame['file'] for frame in capture['frames']]
     destination = folder / 'motion-forward.mp4'
     temporary = destination.with_suffix('.tmp')
+    # WebP decodes to limited-range BT.601 YUV. Do not compress its levels again.
     command = [str(executable), '-hide_banner', '-loglevel', 'error', '-y',
                '-f', 'image2pipe', '-framerate', '30', '-vcodec', 'webp', '-i', 'pipe:0',
                '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-g', '1', '-keyint_min', '1',
                '-bf', '0', '-threads', '2', '-pix_fmt', 'yuv420p',
-               '-vf', 'scale=in_range=pc:out_range=tv:out_color_matrix=bt709',
-               '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
+               '-vf', 'scale=in_range=tv:out_range=tv:in_color_matrix=bt601:out_color_matrix=bt709',
+               '-color_range', 'tv', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
                '-movflags', '+faststart', '-an', '-f', 'mp4', str(temporary)]
     # Stream the validated images rather than loading the sequence into memory.
     process = subprocess.Popen(command, stdin=subprocess.PIPE)
