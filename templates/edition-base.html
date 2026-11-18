@@ -18,7 +18,7 @@
     <nav aria-label="Main">
       {% if home %}<button class="text-button" id="open-stand" type="button">The stand</button>{% else %}<a href="/#showcase">The stand</a>{% endif %}
       <a href="{{ '#about' if home else '/#about' }}" class="nav-secondary">About</a>
-      <a href="/plan" class="nav-start"{% if not home %} aria-current="page"{% endif %}>Plan your campaign</a>
+      <a href="/plan" class="nav-start"{% if not home %} aria-current="page"{% endif %}><span class="header-cta-desktop">Plan your campaign</span><span class="header-cta-mobile">Plan a campaign</span></a>
     </nav>
   </header>
   <main id="main-content">{% block content %}{% endblock %}</main>

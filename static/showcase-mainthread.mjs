@@ -1,3 +1,4 @@
+import {installMobileShowcase} from './showcase-mobile-layout.mjs';
 import {showcaseMotion} from './showcase-motion.mjs';
 import {createVenueSequence} from './showcase-venues.mjs';
 import {createEditionGlow} from './edition-glow.mjs';
@@ -7,6 +8,8 @@ import {installReferenceStand,installPremiumReflections,upgradeCoverTextures} fr
 import {EDITABLE_SLOTS} from './stand-layout.mjs';
 import * as THREE from 'three';
 const root=document.querySelector('#showcase'),host=document.querySelector('#showcase-viewport');
+const disposeMobileLayout=installMobileShowcase(root);
+addEventListener('pagehide',disposeMobileLayout,{once:true});
 const chapters=[...root.querySelectorAll('[data-chapter]')],preference=matchMedia('(prefers-reduced-motion: reduce)');
 const stage=root.querySelector('.showcase-stage'),bar=root.querySelector('.showcase-track span'),chapterButtons=[...root.querySelectorAll('[data-go]')];
 let width=1,height=1,screenVideo,userPaused=false,videoOptIn=false;

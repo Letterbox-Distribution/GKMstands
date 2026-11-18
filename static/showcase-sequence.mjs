@@ -126,7 +126,17 @@ class SequenceRenderer{
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const clip=Number.parseFloat(metadata.clip.match(/inset\(([^p]+)/)?.[1]||'0');
   ctx.beginPath();ctx.rect(0,clip,source.width,source.height-clip);ctx.clip();
-  ctx.drawImage(chosen.bitmap,0,0,source.width,source.height);if(chosen.movie)this.moviePresented=true;
+   ctx.drawImage(chosen.bitmap,0,0,source.width,source.height);if(chosen.movie)this.moviePresented=true;
+   if(mobile&&Number(metadata.studio)<1){
+    if(this.edgeBlend?.width!==source.width){
+     const width=source.width,fade=28;
+     const left=ctx.createLinearGradient(0,0,fade,0);left.addColorStop(0,'#fff');left.addColorStop(1,'#ffffff00');
+     const right=ctx.createLinearGradient(width-fade,0,width,0);right.addColorStop(0,'#ffffff00');right.addColorStop(1,'#fff');
+     this.edgeBlend={width,fade,left,right};
+    }
+    const edge=this.edgeBlend;ctx.fillStyle=edge.left;ctx.fillRect(0,0,edge.fade,source.height);
+    ctx.fillStyle=edge.right;ctx.fillRect(source.width-edge.fade,0,edge.fade,source.height);
+   }
   if(this.video&&metadata.progress<.57)drawScreen(ctx,this.video,metadata.screenCorners);
   ctx.restore();
   if(this.pendingVideo){this.pendingVideo=false;this.emit({type:'video-consumed'});}
