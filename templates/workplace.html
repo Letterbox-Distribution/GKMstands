@@ -1,0 +1,68 @@
+{% extends 'edition-base.html' %}
+{% from 'client-logos-workplace.html' import client_logos %}
+{% block body_class %}edition-home workplace{% endblock %}
+{% block content %}
+<section class="workplace-hero" aria-labelledby="hero-title">
+  <div class="workplace-hero-copy">
+    <h1 id="hero-title">Reach people inside leading UK workplaces.</h1>
+    <p>Choose a weekly space for your printed A5 leaflet in a workplace reception, where employees and visitors pick up what interests them.</p>
+    <div class="workplace-actions"><a class="workplace-button" href="/locations">Explore locations <span aria-hidden="true">→</span></a></div>
+  </div>
+  <figure id="stand-image"><img src="/static/editorial/workplace-stand.webp" width="1448" height="1086" fetchpriority="high" alt="A brushed metal literature stand with six central A5 leaflet positions beneath a portrait screen"><figcaption>Illustrative product image</figcaption></figure>
+</section>
+<section class="workplace-client-strip" aria-labelledby="client-strip-title">
+  <div class="workplace-wrap">
+    <div class="workplace-client-heading"><h2 id="client-strip-title">Clients across Gold Key Media</h2></div>
+    <div class="workplace-client-window" id="workplace-client-window"><div class="workplace-client-track">
+      {{ client_logos(clients) }}
+      {{ client_logos(clients, duplicate=true) }}
+    </div></div>
+    <button class="workplace-client-motion" type="button" aria-controls="workplace-client-window" hidden>Pause logo scroll</button>
+  </div>
+</section>
+<section class="workplace-wrap workplace-section" aria-label="Who you can reach">
+  <div class="workplace-columns">
+    <article><h2>Employees</h2><p>Reach people as they arrive, take a break or head home.</p></article>
+    <article><h2>Business visitors</h2><p>Give guests something to browse while they wait.</p></article>
+    <article><h2>Sector audiences</h2><p>Choose workplaces that match your target industries.</p></article>
+  </div>
+  <a class="workplace-link" href="/audiences">Explore audience profiles <span aria-hidden="true">→</span></a>
+</section>
+<section class="workplace-dark" aria-labelledby="locations-title">
+  <div class="workplace-wrap workplace-band">
+    <div><h2 id="locations-title">Find the right setting.</h2><p>Start with a reception or shared office.</p></div>
+    <nav class="workplace-setting-links" aria-label="Explore example settings">
+      <a href="{{ url_for('locations', setting='Office lobby') }}">Office receptions <span aria-hidden="true">→</span></a>
+      <a href="{{ url_for('locations', setting='Shared workspace') }}">Shared offices <span aria-hidden="true">→</span></a>
+    </nav>
+  </div>
+</section>
+<section class="workplace-wrap workplace-split" id="about" aria-labelledby="about-title">
+  <figure class="workplace-installation-feature"><img src="/static/editorial/installations/zig-zag-building.webp" width="699" height="932" loading="lazy" decoding="async" alt="A Gold Key Media rack beside reception seating in the Zig Zag Building"><figcaption>Zig Zag Building · Digital-screen installation</figcaption></figure>
+  <div>
+    <h2 id="about-title">Workplace access through Gold Key Media</h2>
+    <p>We work with employers, building owners and publishers to bring complimentary reading into headquarters and shared offices as part of their wellbeing offering.</p>
+    <a class="workplace-link" href="https://www.gkml.co.uk/about-us/">About Gold Key Media <span aria-hidden="true">↗</span></a>
+    <a class="workplace-link workplace-installation-link" href="/locations#workplace-installations">See installations <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+<section class="workplace-wrap workplace-split workplace-stand" id="how-it-works" aria-labelledby="service-title">
+  <div>
+    <h2 id="service-title">How A5 leaflet placement works</h2>
+    <ol class="workplace-placement-steps">
+      <li><strong>Choose your locations.</strong> Start with the people you want to reach.</li>
+      <li><strong>Pick positions and weeks.</strong> Your estimate covers space in the rack.</li>
+      <li><strong>Request a quote.</strong> We’ll confirm availability, dates and any print or delivery costs.</li>
+    </ol>
+    <a class="workplace-link" href="/plan">Plan an A5 campaign <span aria-hidden="true">→</span></a>
+  </div>
+  <figure><img src="/static/editorial/workplace-hero.webp" width="1448" height="1086" loading="lazy" decoding="async" alt="A woman selects a leaflet from a literature rack in an office reception"><figcaption>Illustrative reception scene</figcaption></figure>
+</section>
+<section id="questions" class="workplace-wrap workplace-section workplace-faq" aria-labelledby="questions-title">
+  <h2 id="questions-title">Before you book</h2>
+  <details><summary>What does the placement fee cover?</summary><p>Your estimate covers the selected A5 positions and weeks. The final quote confirms placement and sets out any charges for design, production, delivery, replenishment or placement photography.</p></details>
+  <details><summary>Can I request a particular office or sector?</summary><p>Yes. Tell us which industries, employers or areas you want to reach. We’ll confirm suitable buildings and available positions when we review your brief.</p></details>
+  <details><summary>Can I send the artwork later?</summary><p>Yes. You can request a placement while artwork is in progress. We’ll confirm your artwork deadline and production schedule before booking.</p></details>
+</section>
+{% endblock %}
+{% block scripts %}<script src="/static/workplace-clients.mjs" type="module"></script>{% endblock %}

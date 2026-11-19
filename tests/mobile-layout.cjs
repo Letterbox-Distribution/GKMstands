@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
   for(const [width,height] of [[320,568],[390,720],[430,844]]){
    const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
-   await page.goto(process.env.BASE_URL||'http://127.0.0.1:5001');
+   await page.goto((process.env.BASE_URL||'http://127.0.0.1:5001')+'/showcase');
    await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
    assert.equal(await page.locator('.showcase-mobile-tools').evaluate(e=>e.inert),true);
    await page.evaluate(()=>{const r=document.querySelector('#showcase');scrollTo({top:(r.offsetHeight-r.querySelector('.showcase-stage').offsetHeight)*.91,behavior:'instant'})});

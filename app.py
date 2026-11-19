@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request, make_response
-from bookings import register_booking_routes, booking_inventory
+from bookings import register_booking_routes, booking_inventory, earliest_campaign_start
 ROOT = Path(__file__).parent
 app = Flask(__name__)
 app.config.update(TEMPLATES_AUTO_RELOAD=True, SEND_FILE_MAX_AGE_DEFAULT=0)
@@ -26,7 +26,7 @@ STYLE_FILES = (
     'vendor/fonts.css', 'style.css', 'premium.css', 'map-workspace.css',
     'friendly.css', 'one-page.css', 'sections.css', 'location-explorer.css',
     'luxury.css', 'guided-placement.css', 'client-logos.css', 'clear-flow.css',
-    'venue-photos.css', 'planner-polish.css', 'entry-screen.css', 'showcase.css', 'edition-pages.css',
+    'venue-photos.css', 'planner-polish.css', 'entry-screen.css', 'showcase.css', 'edition-pages.css', 'workplace.css',
 )
 STYLE_BUNDLES = {}
 
@@ -94,20 +94,84 @@ def load_venues():
 
 booking_form_token = register_booking_routes(app, lambda: booking_inventory(load_venues()))
 
+SETTING_PHOTOS = {
+    'Office lobby': '/static/editorial/workplace-reception.webp',
+    'Cultural venue': '/static/venue-photos/library.webp',
+    'Shared workspace': '/static/venue-photos/office.webp',
+    'Hotel lobby': '/static/venue-photos/hotel.webp',
+    'Student hub': '/static/venue-photos/university.webp',
+    'Community venue': '/static/venue-photos/library.webp',
+}
+
+CORPORATE_CLIENTS = (
+    ('bbc', 'BBC'), ('sky', 'Sky'), ('spotify', 'Spotify'), ('sony', 'Sony'),
+    ('barclays', 'Barclays'), ('british-airways', 'British Airways'),
+    ('jll', 'JLL'), ('savills', 'Savills'),
+)
+
 def edition_context():
     return {'showcase_styles': current_style_bundle(), 'font_url': versioned_asset('vendor/manrope-0.woff2')}
 
 @app.get('/')
 def index():
-    showcase = request.args.get('view', os.environ.get('GKM_HOME_VIEW', 'showcase')) != 'original'
-    if showcase:
-        return render_template('home.html', home=True, campaign_url='/plan', **edition_context())
-    return render_template('index.html', venues=load_venues(), os_key=map_key(), showcase=False, **edition_context())
+    view = request.args.get('view', os.environ.get('GKM_HOME_VIEW', 'workplace'))
+    if view == 'original':
+        return render_template('index.html', venues=load_venues(), os_key=map_key(), showcase=False, **edition_context())
+    if view == 'showcase' or any(flag in request.args for flag in ('live', 'frames', 'images')):
+        return stand_showcase()
+    return render_template('workplace.html', clients=CORPORATE_CLIENTS, **edition_context())
 
-@app.get('/plan')
+@app.get('/showcase')
+def stand_showcase():
+    return render_template('home.html', home=True, campaign_url='/plan', **edition_context())
+
+@app.get('/audiences')
+def audiences():
+    return render_template('audiences.html', **edition_context())
+
+@app.get('/clients')
+def clients():
+    return render_template('clients.html', clients=CORPORATE_CLIENTS, **edition_context())
+
+@app.get('/leaflet-guide')
+def leaflet_guide():
+    return render_template('leaflet-guide.html', **edition_context())
+
+@app.get('/locations')
+def locations():
+    venues = load_venues()
+    cities = sorted({venue['city'] for venue in venues})
+    settings = sorted({venue['type'] for venue in venues})
+    city = request.args.get('city', '')
+    setting = request.args.get('setting', '')
+    query = request.args.get('q', '').strip()[:100]
+    results = [
+        venue for venue in venues
+        if (not city or venue['city'] == city)
+        and (not setting or venue['type'] == setting)
+        and all(term in ' '.join((venue['name'], venue['city'], venue['area'], venue['type'],
+                                  *(venue.get('audiences') or []), *(venue.get('descriptors') or []))).casefold()
+                for term in query.casefold().split())
+    ]
+    starting_pence = {
+        venue['id']: min(slot['weekly_pence'] for slot in venue['facings'])
+        for venue in booking_inventory(results) if venue['facings']
+    }
+    return render_template('locations.html', venues=results, cities=cities, settings=settings,
+                           city=city, setting=setting, query=query, starting_pence=starting_pence,
+                           setting_photos=SETTING_PHOTOS, **edition_context())
+
 @app.get('/booking')
+@app.get('/plan')
 def plan_campaign():
-    response = make_response(render_template('booking.html', home=False, venues=booking_inventory(load_venues()), os_key=map_key(), booking_token=booking_form_token(), **edition_context()))
+    venues = [venue for venue in booking_inventory(load_venues()) if venue['facings']]
+    preferred_venue = next((venue for venue in venues if venue['id'] == request.args.get('venue')), None)
+    cities = list(dict.fromkeys(venue['city'] for venue in venues))
+    lead_days = app.config['BOOKING_LEAD_DAYS']
+    response = make_response(render_template(
+        'booking.html', venues=venues, os_key=map_key(), booking_token=booking_form_token(),
+        preferred_venue=preferred_venue, earliest_start=earliest_campaign_start(lead_days).isoformat(),
+        lead_days=lead_days, setting_photos=SETTING_PHOTOS, cities=cities, **edition_context()))
     response.headers['Cache-Control'] = 'no-store'
     return response
 

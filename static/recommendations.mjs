@@ -8,8 +8,10 @@ export const CAMPAIGN_TYPES={
  hospitality:{label:'Food & hospitality',audiences:['Travellers','Office professionals','Leisure visitors'],types:['Hotel lobby','Hotel lounge','Office lobby','Shared workspace']}
 };
 export function recommendation(venue,filters){
- const result=evaluate(venue,filters),profile=CAMPAIGN_TYPES[filters.media];
- const preferred=!profile||profile.types.includes(venue.type);
+ const result=evaluate(venue,filters);
+ const profiles=filters.profiles??[CAMPAIGN_TYPES[filters.media]].filter(Boolean);
+ const profile=profiles.find(item=>item.types.includes(venue.type));
+ const preferred=!profiles.length||Boolean(profile);
  const overlap=(filters.audiences||[]).filter(a=>venue.audiences?.includes(a));
  return {...result,preferred,score:(preferred?10:0)+overlap.length,reason:profile&&preferred?profile.label+' setting':overlap.length?overlap.join(' / '):'Fits your city and budget'};
 }

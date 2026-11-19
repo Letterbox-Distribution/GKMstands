@@ -1,0 +1,18 @@
+{% extends 'edition-base.html' %}
+{% from 'client-logos-workplace.html' import client_logos %}
+{% block title %}Corporate clients | Gold Key Media Edition{% endblock %}
+{% block body_class %}edition-home workplace{% endblock %}
+{% block content %}
+<header class="workplace-dark"><div class="workplace-wrap workplace-page-intro">
+  <h1>Corporate clients</h1>
+  <p>A selection of clients from Gold Key Media’s corporate media work.</p>
+</div></header>
+<section class="workplace-wrap workplace-section workplace-client-gallery" aria-label="Selected corporate clients">
+  {{ client_logos(clients) }}
+  <p>Gold Key Media confirms eligible locations and availability for each A5 leaflet campaign.</p>
+</section>
+<section class="workplace-dark"><div class="workplace-wrap workplace-band">
+  <div><h2>Find the right workplace for your campaign</h2></div>
+  <a class="workplace-button" href="{{ url_for('locations') }}">Explore locations <span aria-hidden="true">→</span></a>
+</div></section>
+{% endblock %}

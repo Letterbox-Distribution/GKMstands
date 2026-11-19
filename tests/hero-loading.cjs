@@ -8,7 +8,7 @@ const path=require('node:path');
   const errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
   await page.addInitScript(()=>{window.timerGaps=[];let previous=performance.now();setInterval(()=>{const now=performance.now();window.timerGaps.push(now-previous);previous=now;},25);});
   const cdp=await page.context().newCDPSession(page);await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});
-  await page.goto(process.env.BASE_URL||'http://127.0.0.1:5000',{waitUntil:'commit'});
+  await page.goto((process.env.BASE_URL||'http://127.0.0.1:5000')+'/showcase',{waitUntil:'commit'});
   await page.waitForFunction(()=>document.querySelector('.showcase-instant img')?.complete);
   await page.waitForFunction(()=>document.body?.dataset.entryReady==='true',null,{timeout:90000});
   await page.evaluate(()=>{window.timerGaps=[];window.scrollUpdates=0;const timer=setInterval(()=>{scrollBy({top:22,behavior:'instant'});if(++window.scrollUpdates===80)clearInterval(timer)},40)});

@@ -3,8 +3,8 @@
 <html lang="en-GB">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="GoldKey Edition. Premium A5 leaflet placement, thoughtfully presented alongside established magazine titles.">
-  <title>{% block title %}GoldKey Edition — A place for your brand{% endblock %}</title>
+  <meta name="description" content="Reach employees and visitors with targeted A5 leaflet advertising in UK corporate receptions and communal spaces.">
+  <title>{% block title %}Gold Key Media Edition | Workplace leaflet advertising{% endblock %}</title>
   <link rel="icon" href="data:,"><link rel="stylesheet" href="{{ showcase_styles }}">
   <script type="importmap">{"imports":{"three":"/static/vendor/three/three.module.js"}}</script>
   <link rel="preload" as="image" href="/static/goldkey-select.png"><link rel="preload" as="font" href="{{ font_url }}" type="font/woff2" crossorigin>
@@ -13,19 +13,25 @@
 <body class="showcase-enabled {% block body_class %}{% endblock %}">
   {% block entry %}{% endblock %}
   <a class="skip" href="#main-content">Skip to content</a>
-  <header class="header">
+  <header class="header{% if not home %} workplace-header{% endif %}">
     <a class="wordmark" href="/" aria-label="GoldKey Edition home">{{ brand('header') }}</a>
     <nav aria-label="Main">
-      {% if home %}<button class="text-button" id="open-stand" type="button">The stand</button>{% else %}<a href="/#showcase">The stand</a>{% endif %}
-      <a href="{{ '#about' if home else '/#about' }}" class="nav-secondary">About</a>
-      <a href="/plan" class="nav-start"{% if not home %} aria-current="page"{% endif %}><span class="header-cta-desktop">Plan your campaign</span><span class="header-cta-mobile">Plan a campaign</span></a>
+      {% if home %}
+      <button class="text-button" id="open-stand" type="button">The stand</button>
+      <a href="/#about" class="nav-secondary">About</a>
+      {% else %}
+      <a href="/locations"{% if request.path == '/locations' %} aria-current="page"{% endif %}>Locations</a>
+      <a href="/audiences"{% if request.path == '/audiences' %} aria-current="page"{% endif %}>Audiences</a>
+      <a href="/#how-it-works">How it works</a>
+      <a href="/leaflet-guide"{% if request.path == '/leaflet-guide' %} aria-current="page"{% endif %}>Leaflet guide</a>
+      {% endif %}
+      <a href="/plan" class="nav-start"{% if request.endpoint == 'plan_campaign' %} aria-current="page"{% endif %}><span class="header-cta-desktop">Plan a campaign</span><span class="header-cta-mobile">Plan a campaign</span></a>
     </nav>
   </header>
   <main id="main-content">{% block content %}{% endblock %}</main>
   <footer class="footer edition-footer edition-container">
     <a class="wordmark" href="/" aria-label="GoldKey Edition home">{{ brand('footer') }}</a>
-    <nav aria-label="Footer"><a href="/#about">Gold Key Media</a><a href="/#the-service">The service</a><a href="/#questions">Questions</a><a href="mailto:info@gkml.co.uk">Contact us</a></nav>
-    <small>Thoughtfully placed. Expertly connected.</small>
+    <nav aria-label="Footer"><a href="/#about">Gold Key Media</a><a href="/clients">Clients</a><a href="/#stand-image">The stand</a><a href="/#questions">Questions</a><a href="mailto:info@gkml.co.uk">Contact us</a></nav>
   </footer>
   {% block scripts %}{% endblock %}
 </body>

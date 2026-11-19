@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');const assert=require('node:assert/strict');
 (async()=>{
  const b=await chromium.launch({channel:'chrome',headless:true});const p=await b.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const errors=[];p.on('pageerror',e=>errors.push(e.message));
- await p.goto('http://127.0.0.1:5000');await p.locator('.hero-discover').click();await p.locator('#campaign-type').selectOption('general');await p.locator('#show-matches').click();await p.locator('.venue-row').first().waitFor();
+ await p.goto('http://127.0.0.1:5000/?view=original');await p.locator('.hero-discover').click();await p.locator('#campaign-type').selectOption('general');await p.locator('#show-matches').click();await p.locator('.venue-row').first().waitFor();
  const text=async s=>p.locator(s).textContent();
  await p.locator('.audience-menu summary').click();await p.locator('.chip input[value="Office professionals"]').check();await p.locator('.audience-menu summary').click();await p.locator('#budget').fill('400');await p.locator('#weeks').fill('2');
  assert.match(await text('#result-count'),/4 matches/);

@@ -3,30 +3,39 @@ import {CAMPAIGN_TYPES,recommendation,suggestSlots} from './recommendations.mjs'
 import {venuePhoto} from './venue-photos.mjs';
 
 const $=selector=>document.querySelector(selector);
-const {venues,osKey}=JSON.parse($('#booking-data').textContent);
-const cityNames=['London','Birmingham','Manchester'];
+const {venues,osKey,settingPhotos={}}=JSON.parse($('#booking-data').textContent);
+const cityNames=[...new Set(venues.map(venue=>venue.city))];
 const campaignLabels={...Object.fromEntries(Object.entries(CAMPAIGN_TYPES).map(([key,value])=>[key,value.label])),general:'Help me choose'};
+const preferredVenue=venues.find(venue=>venue.id===$('#booking-preferred-venue')?.dataset.venue);
+const savedCampaigns=value=>[...new Set((Array.isArray(value.campaigns)?value.campaigns:[value.campaign]).filter(choice=>Object.hasOwn(campaignLabels,choice)))];
 const draftKey='goldkey-edition-campaign-v1',receiptKey='goldkey-edition-receipt-v1';
 const esc=value=>String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
-const fresh=()=>({campaign:'',cities:[...cityNames],budget:null,weeks:1,start:'',placements:[],requestKey:crypto.randomUUID?.()||[...crypto.getRandomValues(new Uint8Array(16))].map(value=>value.toString(16).padStart(2,'0')).join('')});
+const fresh=()=>({campaigns:[],cities:[...cityNames],budget:null,weeks:1,start:'',placements:[],requestKey:crypto.randomUUID?.()||[...crypto.getRandomValues(new Uint8Array(16))].map(value=>value.toString(16).padStart(2,'0')).join('')});
 let state=fresh(),step=1,cityFilter='',search='',expandedVenue='',focusedVenue='',noticeTimer,map,mapPromise,markers=[],artwork,artworkUrl,receipt,submitting=false;
+let suggestedPlan=[];
 try{
  const saved=JSON.parse(sessionStorage.getItem(draftKey));
- if(saved&&campaignLabels[saved.campaign]){
-  state={...state,campaign:saved.campaign,cities:cityNames.filter(city=>saved.cities?.includes(city)),weeks:Math.max(1,Math.min(52,Number(saved.weeks)||1)),start:/^\d{4}-\d{2}-\d{2}$/.test(saved.start)?saved.start:'',budget:Number.isInteger(saved.budget)&&saved.budget>=0?saved.budget:null};
+ if(saved){
+  state={...state,campaigns:savedCampaigns(saved),cities:cityNames.filter(city=>saved.cities?.includes(city)),weeks:Math.max(1,Math.min(52,Number(saved.weeks)||1)),start:/^\d{4}-\d{2}-\d{2}$/.test(saved.start)?saved.start:'',budget:Number.isInteger(saved.budget)&&saved.budget>=0?saved.budget:null};
   state.placements=(saved.placements||[]).filter((line,index,all)=>venues.some(venue=>venue.id===line.venue_id&&venue.facings.some(slot=>slot.id===line.slot_id))&&all.findIndex(other=>other.venue_id===line.venue_id&&other.slot_id===line.slot_id)===index);
   if(typeof saved.requestKey==='string'&&/^[a-zA-Z0-9-]{16,64}$/.test(saved.requestKey))state.requestKey=saved.requestKey;
  }
 }catch{/* A private/restricted browser still supports the complete booking flow. */}
-const today=new Date(),localDate=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
-$('#booking-start').min=localDate;if(state.start&&state.start<localDate)state.start='';
+if(preferredVenue&&!state.cities.includes(preferredVenue.city))state.cities.push(preferredVenue.city);
+if(state.start&&state.start<$('#booking-start').min){
+ state.start='';
+ $('#booking-lead-time').append(' Your saved date is now too soon. Choose a later date or leave it open.');
+}
 $('#booking-budget').value=state.budget===null?'':state.budget/100;
 if(![...$('#booking-weeks').options].some(option=>Number(option.value)===state.weeks))$('#booking-weeks').add(new Option(state.weeks+' weeks',state.weeks));
 $('#booking-weeks').value=state.weeks;$('#booking-start').value=state.start;
 
 function lines(){return state.placements.map(item=>{const venue=venues.find(venue=>venue.id===item.venue_id);return {key:item.venue_id+':'+item.slot_id,venue,slot:venue.facings.find(slot=>slot.id===item.slot_id)};});}
-function filters(){return {media:state.campaign,cities:state.cities,city:'',audiences:CAMPAIGN_TYPES[state.campaign]?.audiences||[],descriptor:'',budget:state.budget,weeks:state.weeks,lines:lines()};}
+function filters(){
+ const profiles=state.campaigns.map(choice=>CAMPAIGN_TYPES[choice]).filter(Boolean);
+ return {media:state.campaigns[0],profiles,cities:state.cities,city:'',audiences:[...new Set(profiles.flatMap(profile=>profile.audiences))],descriptor:'',budget:state.budget,weeks:state.weeks,lines:lines()};
+}
 function total(){return totalPence(lines(),state.weeks);}
 function selectedAt(venue){return state.placements.filter(item=>item.venue_id===venue.id);}
 function save(){try{sessionStorage.setItem(draftKey,JSON.stringify(state));}catch{}}
@@ -34,9 +43,11 @@ function notify(message){const notice=$('#booking-notice');notice.textContent=me
 function budgetMessage(){const over=state.budget===null?0:total()-state.budget;return over>0?money(over)+' over your budget. You can keep these spaces or edit your plan.':'';}
 
 function sync(){
- document.querySelectorAll('[data-campaign]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.campaign===state.campaign)));
+ document.querySelectorAll('[data-campaign]').forEach(button=>button.setAttribute('aria-pressed',String(state.campaigns.includes(button.dataset.campaign))));
  document.querySelectorAll('[data-booking-city]').forEach(button=>button.setAttribute('aria-pressed',String(state.cities.includes(button.dataset.bookingCity))));
  const count=state.placements.length,locations=new Set(state.placements.map(item=>item.venue_id)).size;
+ $('#booking-summary-categories-row').hidden=!state.campaigns.length;
+ $('#booking-summary-categories').textContent=state.campaigns.map(choice=>campaignLabels[choice]).join(' · ');
  $('#booking-summary-cities').textContent=state.cities.length+' '+(state.cities.length===1?'city':'cities');
  $('#booking-summary-weeks').textContent=state.weeks+' '+(state.weeks===1?'week':'weeks');$('#booking-summary-start-row').hidden=!state.start;$('#booking-summary-start').textContent=state.start?new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(state.start+'T12:00:00')):'';
  $('#booking-summary-count').textContent=count?count+' '+(count===1?'space':'spaces')+' in '+locations+' '+(locations===1?'location':'locations'):'No locations selected yet';
@@ -45,13 +56,14 @@ function sync(){
  $('.booking-basket').hidden=!count||step!==2;
  $('#basket-count').textContent=count+' '+(count===1?'space':'spaces')+' · '+locations+' '+(locations===1?'location':'locations');
  $('#basket-total').textContent=money(total());$('#basket-budget').textContent=state.budget!==null&&total()>state.budget?money(total()-state.budget)+' over budget':'';$('#basket-budget').hidden=!$('#basket-budget').textContent;
- document.querySelectorAll('[data-step-nav]').forEach(button=>{const next=Number(button.dataset.stepNav);button.disabled=next===2?!(state.campaign&&state.cities.length):next===3?!count:false;button.toggleAttribute('aria-current',next===step);if(next===step)button.setAttribute('aria-current','step');});
+ document.querySelectorAll('[data-step-nav]').forEach(button=>{const next=Number(button.dataset.stepNav);button.disabled=next===2?!(state.campaigns.length&&state.cities.length):next===3?!count:false;button.toggleAttribute('aria-current',next===step);if(next===step)button.setAttribute('aria-current','step');});
  save();
 }
 
 async function go(next,{history=true,focus=true}={}){
- if(next===2&&(!state.campaign||!state.cities.length))next=1;
- if(next===3&&!state.placements.length)next=state.campaign?2:1;
+ if(next===3&&(!state.placements.length||!state.campaigns.length))next=2;
+ if(next===2&&(!state.campaigns.length||!state.cities.length))next=1;
+ if(next>1&&!$('#booking-brief').checkValidity())next=1;
  step=next;document.body.dataset.step=String(next);clearTimeout(noticeTimer);$('#booking-notice').hidden=true;
  document.querySelectorAll('[data-booking-step]').forEach(section=>section.hidden=Number(section.dataset.bookingStep)!==step);
  $('#booking-confirmation').hidden=true;
@@ -66,7 +78,12 @@ async function go(next,{history=true,focus=true}={}){
 
 document.querySelectorAll('[data-step-nav]').forEach(button=>button.addEventListener('click',()=>go(Number(button.dataset.stepNav))));
 document.querySelectorAll('[data-back]').forEach(button=>button.addEventListener('click',()=>go(Number(button.dataset.back))));
-document.querySelectorAll('[data-campaign]').forEach(button=>button.addEventListener('click',()=>{state.campaign=button.dataset.campaign;$('#brief-error').hidden=true;sync();}));
+document.querySelectorAll('[data-campaign]').forEach(button=>button.addEventListener('click',()=>{
+ const choice=button.dataset.campaign;
+ if(state.campaigns.includes(choice))state.campaigns=state.campaigns.filter(item=>item!==choice);
+ else state.campaigns=choice==='general'?[choice]:[...state.campaigns.filter(item=>item!=='general'),choice];
+ $('#brief-error').hidden=true;sync();
+}));
 document.querySelectorAll('[data-booking-city]').forEach(button=>button.addEventListener('click',()=>{
  const city=button.dataset.bookingCity;
  state.cities=state.cities.includes(city)?state.cities.filter(item=>item!==city):cityNames.filter(item=>item===city||state.cities.includes(item));
@@ -79,54 +96,88 @@ for(const id of ['booking-budget','booking-weeks','booking-start'])$('#'+id).add
  state.weeks=Math.max(1,Math.min(52,Number($('#booking-weeks').value)||1));state.start=$('#booking-start').value;sync();
 });
 $('#booking-brief').addEventListener('submit',event=>{
- event.preventDefault();const message=!state.campaign?'Choose what you are promoting to continue.':!state.cities.length?'Choose at least one city to continue.':'';
+ event.preventDefault();const message=!state.campaigns.length?'Choose what you are promoting to continue.':!state.cities.length?'Choose at least one city to continue.':'';
  $('#brief-error').textContent=message;$('#brief-error').hidden=!message;
- if(message){(!state.campaign?$('[data-campaign]'):$('[data-booking-city]')).focus();return;}
- cityFilter='';go(2);
+ if(message){(!state.campaigns.length?$('[data-campaign]'):$('[data-booking-city]')).focus();return;}
+ cityFilter='';
+ if(preferredVenue&&state.cities.includes(preferredVenue.city)&&!expandedVenue)expandedVenue=preferredVenue.id;
+ go(2);
 });
 
-function visibleVenues(){return venues.filter(venue=>state.cities.includes(venue.city)&&(!cityFilter||venue.city===cityFilter)&&(!search||[venue.name,venue.city,venue.area,venue.type].join(' ').toLowerCase().includes(search))).sort((a,b)=>recommendation(b,filters()).score-recommendation(a,filters()).score||cheapest(a)-cheapest(b));}
+function visibleVenues(){
+ const criteria=filters();
+ const terms=search.split(/\s+/).filter(Boolean);
+ return venues.filter(venue=>{
+  if(!state.cities.includes(venue.city)||(cityFilter&&venue.city!==cityFilter))return false;
+  const description=[venue.name,venue.city,venue.area,venue.type,...(venue.audiences||[]),...(venue.descriptors||[])].join(' ').toLowerCase();
+  return terms.every(term=>description.includes(term));
+ })
+  .sort((a,b)=>Number(b===preferredVenue)-Number(a===preferredVenue)||recommendation(b,criteria).score-recommendation(a,criteria).score||cheapest(a)-cheapest(b));
+}
 function renderDiscovery(refit=false){
  const available=visibleVenues();
  $('#booking-city-filters').innerHTML=['',...state.cities].map(city=>'<button type="button" data-filter-city="'+esc(city)+'" aria-pressed="'+(cityFilter===city)+'">'+esc(city||'All cities')+'</button>').join('');
  $('#booking-results-note').textContent=available.length+' '+(available.length===1?'location':'locations')+' · numbered to match the map';
- const suggestion=suggestSlots(venues,filters());$('#booking-suggestion').hidden=!!state.placements.length||!suggestion.length;
- if(suggestion.length)$('#booking-suggestion').innerHTML='<div><strong>A considered starting point</strong><p>'+suggestion.length+' locations · '+money(suggestion.reduce((sum,item)=>sum+item.cost,0))+' estimated for '+state.weeks+' '+(state.weeks===1?'week':'weeks')+'</p></div><button type="button" class="edition-text-button" data-suggested>Use suggested plan →</button>';
+ suggestedPlan=state.placements.length||available.includes(preferredVenue)?[]:suggestSlots(available,filters());
+ $('#booking-suggestion').hidden=!suggestedPlan.length;
+ if(suggestedPlan.length){
+  const totalEstimate=suggestedPlan.reduce((sum,item)=>sum+item.cost,0);
+  $('#booking-suggested-venues').textContent=suggestedPlan.map(item=>item.venue.name).join(' · ');
+  $('#booking-suggested-estimate').textContent=money(totalEstimate)+' estimated for '+state.weeks+' '+(state.weeks===1?'week':'weeks');
+ }
  $('#booking-venues').innerHTML=available.length?available.map(venue=>{
-  const photo=venuePhoto(venue.type),chosen=selectedAt(venue),number=venues.indexOf(venue)+1;
+  const photo=settingPhotos[venue.type]||venuePhoto(venue.type).src,chosen=selectedAt(venue),number=venues.indexOf(venue)+1;
   const low=cheapest(venue),high=Math.max(...venue.facings.map(slot=>slot.weekly_pence)),range=money(low)+(high>low?'\u2013'+money(high):'');
-  return '<article class="booking-venue'+(chosen.length?' is-selected':'')+(focusedVenue===venue.id?' is-focused':'')+'" id="venue-'+venue.id+'"><div class="booking-venue-image"><img src="'+photo.src+'" alt="Representative '+photo.kind+' setting, not the actual venue" width="640" height="360" loading="lazy" decoding="async"><span class="booking-photo-label">Representative setting</span>'+(chosen.length?'<span class="booking-selected-badge"><b>✓</b>'+chosen.length+' selected</span>':'')+'</div><div class="booking-venue-copy"><div class="booking-venue-title"><span class="booking-location-number">'+number+'</span><h3>'+esc(venue.name)+'</h3></div><p>'+esc(venue.city+' · '+venue.area)+'<br>'+esc(venue.type)+'</p><div class="booking-venue-bottom"><span class="booking-venue-price"><strong>'+range+'</strong><small>per week / A5 position</small></span><button type="button" class="edition-text-button" data-open-venue="'+venue.id+'" aria-expanded="'+(expandedVenue===venue.id)+'" aria-controls="spaces-'+venue.id+'">'+(chosen.length?'Edit spaces':'Choose space')+' '+(expandedVenue===venue.id?'−':'↗')+'</button></div></div><div class="booking-spaces" id="spaces-'+venue.id+'"'+(expandedVenue===venue.id?'':' hidden')+'><strong>Choose your A5 position</strong><p class="booking-position-guide">Front of stand: top, middle, bottom. Left and right match the stand preview.</p><div class="booking-space-grid" aria-label="Six A5 positions, shown from the front of the stand">'+venue.facings.map((slot,index)=>{
+  return '<article class="booking-venue'+(chosen.length?' is-selected':'')+(focusedVenue===venue.id?' is-focused':'')+'" id="venue-'+venue.id+'"><div class="booking-venue-image"><img src="'+esc(photo)+'" alt="" width="640" height="360" loading="lazy" decoding="async"><span class="booking-photo-label">Representative setting</span>'+(chosen.length?'<span class="booking-selected-badge"><b>✓</b>'+chosen.length+' selected</span>':'')+'</div><div class="booking-venue-copy"><div class="booking-venue-title"><span class="booking-location-number">'+number+'</span><h3>'+esc(venue.name)+'</h3></div><p>'+esc(venue.city+' · '+venue.area)+'<br>'+esc(venue.type)+'</p><div class="booking-venue-bottom"><span class="booking-venue-price"><strong>'+range+'</strong><small>per week / A5 position</small></span><button type="button" class="edition-text-button" data-open-venue="'+venue.id+'" aria-expanded="'+(expandedVenue===venue.id)+'" aria-controls="spaces-'+venue.id+'">'+(chosen.length?'Edit spaces':'Choose space')+' '+(expandedVenue===venue.id?'−':'↗')+'</button></div></div><div class="booking-spaces" id="spaces-'+venue.id+'"'+(expandedVenue===venue.id?'':' hidden')+'><strong>Choose your A5 position</strong><p class="booking-position-guide">Choose a row and side as you’d see them facing the stand. Weekly rates vary by position and cover rack space. Print and delivery costs are agreed in your quote.</p><div class="booking-space-grid" aria-label="A5 positions, shown from the front of the stand">'+venue.facings.map((slot,index)=>{
    const selected=chosen.some(item=>item.slot_id===slot.id),label=slot.label.replace(' - ',' ');
    return '<button type="button" data-select-venue="'+venue.id+'" data-select-space="'+slot.id+'" aria-pressed="'+selected+'" aria-label="'+esc(label+' at '+venue.name+', '+money(slot.weekly_pence)+' per week')+'"><span>'+ (index+1)+'</span><span>'+esc(label)+'<small>'+money(slot.weekly_pence)+' / week</small></span>'+(selected?'<b class="booking-position-check" aria-hidden="true">\u2713</b>':'')+'</button>';
   }).join('')+'</div></div></article>';
  }).join(''):'<p class="booking-empty">No locations match that search. Try another name or city.</p>';
  updateMap(refit);
 }
+
 $('#locations-step').addEventListener('click',event=>{
- const city=event.target.closest('[data-filter-city]');if(city){cityFilter=city.dataset.filterCity;renderDiscovery(true);return;}
- const open=event.target.closest('[data-open-venue]');if(open){expandedVenue=expandedVenue===open.dataset.openVenue?'':open.dataset.openVenue;if(expandedVenue)focusedVenue=expandedVenue;renderDiscovery();if(expandedVenue)focusVenueOnMap(expandedVenue);document.querySelector('[data-open-venue="'+open.dataset.openVenue+'"]').focus({preventScroll:true});return;}
+ const city=event.target.closest('[data-filter-city]');
+ if(city){
+  cityFilter=city.dataset.filterCity;
+  renderDiscovery(true);
+  $('#booking-city-filters [aria-pressed=true]').focus({preventScroll:true});
+  return;
+ }
+ const open=event.target.closest('[data-open-venue]');if(open){expandedVenue=expandedVenue===open.dataset.openVenue?'':open.dataset.openVenue;if(expandedVenue)focusedVenue=expandedVenue;renderDiscovery();if(expandedVenue)focusVenueOnMap(expandedVenue);document.querySelector('[data-open-venue="'+open.dataset.openVenue+'"]')?.focus({preventScroll:true});return;}
  const choice=event.target.closest('[data-select-space]');if(choice){
   const {selectVenue:venue_id,selectSpace:slot_id}=choice.dataset,index=state.placements.findIndex(item=>item.venue_id===venue_id&&item.slot_id===slot_id);
   if(index>=0)state.placements.splice(index,1);else state.placements.push({venue_id,slot_id});
-  sync();renderDiscovery();document.querySelector('[data-select-venue="'+venue_id+'"][data-select-space="'+slot_id+'"]').focus({preventScroll:true});
+  sync();renderDiscovery();document.querySelector('[data-select-venue="'+venue_id+'"][data-select-space="'+slot_id+'"]')?.focus({preventScroll:true});
   return;
  }
  const card=event.target.closest('.booking-venue');
  if(card&&!event.target.closest('.booking-spaces,a,button,input,select,textarea,label')){const trigger=card.querySelector('[data-open-venue]');trigger.click();return;}
  if(event.target.closest('[data-suggested]')){
-  for(const item of suggestSlots(venues,filters()))state.placements.push({venue_id:item.venue.id,slot_id:item.slot.id});
-  sync();renderDiscovery();
+  for(const item of suggestedPlan)state.placements.push({venue_id:item.venue.id,slot_id:item.slot.id});
+  sync();renderDiscovery();$('#booking-review').focus({preventScroll:true});
  }
 });
 $('#booking-search').addEventListener('input',event=>{search=event.target.value.trim().toLowerCase();renderDiscovery(true);});
 $('#booking-review').addEventListener('click',()=>go(3));
 
 function reviewMarkup(items,weeks,removable=true){return items.map(item=>{
- const venue=venues.find(venue=>venue.id===item.venue_id),slot=venue.facings.find(slot=>slot.id===item.slot_id),photo=venuePhoto(venue.type);
- return '<article class="booking-review-line"><img src="'+photo.src+'" alt="Representative '+photo.kind+' setting" width="94" height="76" loading="lazy"><div><h3>'+esc(venue.name)+'</h3><p>'+esc(venue.city+' · '+slot.label.replace(' - ',' '))+'<br>'+money(slot.weekly_pence)+' / week × '+weeks+' '+(weeks===1?'week':'weeks')+'</p></div><div><strong>'+money(slot.weekly_pence*weeks)+'</strong>'+(removable?'<button type="button" class="edition-text-button" data-remove-venue="'+venue.id+'" data-remove-space="'+slot.id+'">Remove</button>':'')+'</div></article>';
+ const venue=venues.find(venue=>venue.id===item.venue_id),slot=venue.facings.find(slot=>slot.id===item.slot_id);
+ const photo=settingPhotos[venue.type]||venuePhoto(venue.type).src;
+ return '<article class="booking-review-line"><img src="'+esc(photo)+'" alt="" width="94" height="76" loading="lazy"><div><h3>'+esc(venue.name)+'</h3><p>'+esc(venue.city+' · '+slot.label.replace(' - ',' '))+'<br>'+money(slot.weekly_pence)+' / week × '+weeks+' '+(weeks===1?'week':'weeks')+'</p></div><div><strong>'+money(slot.weekly_pence*weeks)+'</strong>'+(removable?'<button type="button" class="edition-text-button" data-remove-venue="'+venue.id+'" data-remove-space="'+slot.id+'">Remove</button>':'')+'</div></article>';
 }).join('');}
 function renderReview(){$('#booking-review-lines').innerHTML=reviewMarkup(state.placements,state.weeks);}
-$('#booking-review-lines').addEventListener('click',event=>{const button=event.target.closest('[data-remove-space]');if(!button)return;state.placements=state.placements.filter(item=>!(item.venue_id===button.dataset.removeVenue&&item.slot_id===button.dataset.removeSpace));if(!state.placements.length)go(2);else{renderReview();sync();}});
+$('#booking-review-lines').addEventListener('click',event=>{
+ const button=event.target.closest('[data-remove-space]');
+ if(!button)return;
+ const index=state.placements.findIndex(item=>item.venue_id===button.dataset.removeVenue&&item.slot_id===button.dataset.removeSpace);
+ if(index<0)return;
+ state.placements.splice(index,1);
+ if(!state.placements.length){go(2);return;}
+ renderReview();sync();
+ const remaining=$('#booking-review-lines').querySelectorAll('[data-remove-space]');
+ remaining[Math.min(index,remaining.length-1)].focus({preventScroll:true});
+});
 
 async function ensureMap(){
  if(map)return;if(!mapPromise)mapPromise=(async()=>{
@@ -178,22 +229,23 @@ $('#booking-artwork-preview').addEventListener('click',event=>{if(!event.target.
 
 $('#booking-request-form').addEventListener('submit',async event=>{
  event.preventDefault();if(submitting)return;if(!state.placements.length){go(2);return;}
+ if(!$('#booking-brief').checkValidity()){await go(1);$('#booking-brief').reportValidity();return;}
  const form=event.currentTarget;if(!form.reportValidity())return;
- const fields=new FormData(form),payload={request_key:state.requestKey,campaign:state.campaign,weeks:state.weeks,start:state.start,budget_pence:state.budget,placements:state.placements,name:fields.get('name'),email:fields.get('email'),company:fields.get('company'),phone:fields.get('phone'),notes:fields.get('notes'),consent:fields.get('consent')==='on',website:fields.get('website')};
+ const fields=new FormData(form),payload={request_key:state.requestKey,campaigns:state.campaigns,weeks:state.weeks,start:state.start,budget_pence:state.budget,placements:state.placements,name:fields.get('name'),email:fields.get('email'),company:fields.get('company'),phone:fields.get('phone'),notes:fields.get('notes'),consent:fields.get('consent')==='on',website:fields.get('website')};
  const body=new FormData();body.set('request',JSON.stringify(payload));if(artwork)body.set('artwork',artwork);
  submitting=true;$('#booking-send').disabled=true;$('#booking-send').textContent='Saving your request…';$('#booking-submit-error').hidden=true;
  try{
   const response=await fetch('/api/booking-requests',{method:'POST',headers:{'X-Booking-Token':$('meta[name="booking-token"]').content},body});
   const result=await response.json().catch(()=>({error:'Your request could not be saved. Please try again.'}));if(!response.ok)throw Error(result.error||'Your request could not be saved. Please try again.');
-  receipt={reference:result.reference,total:result.total_pence,campaign:state.campaign,weeks:state.weeks,start:state.start,placements:state.placements.map(item=>({...item}))};
+  receipt={reference:result.reference,total:result.total_pence,campaigns:state.campaigns,weeks:state.weeks,start:state.start,placements:state.placements.map(item=>({...item}))};
   try{sessionStorage.setItem(receiptKey,JSON.stringify(receipt));sessionStorage.removeItem(draftKey);}catch{}
   showReceipt();
  }catch(error){$('#booking-submit-error').textContent=error.message;$('#booking-submit-error').hidden=false;$('#booking-submit-error').scrollIntoView({behavior:reduced?'instant':'smooth',block:'nearest'});}
- finally{submitting=false;$('#booking-send').disabled=false;$('#booking-send').innerHTML='Request booking <span aria-hidden="true">→</span>';}
+ finally{submitting=false;$('#booking-send').disabled=false;$('#booking-send').innerHTML='Request a quote <span aria-hidden="true">→</span>';}
 });
 function showReceipt({history=true}={}){
  step=4;document.body.dataset.step='4';clearTimeout(noticeTimer);$('#booking-notice').hidden=true;$('.booking-basket').hidden=true;$('#booking-confirmation').hidden=false;$('#booking-reference').textContent=receipt.reference;
- $('#booking-confirmation-summary').innerHTML='<p class="booking-receipt-brief"><strong>'+esc(campaignLabels[receipt.campaign])+'</strong><span>'+receipt.weeks+' '+(receipt.weeks===1?'week':'weeks')+(receipt.start?' - Preferred start '+esc(new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(receipt.start+'T12:00:00'))):' - Start date to confirm')+'</span></p>'+reviewMarkup(receipt.placements,receipt.weeks,false)+'<div class="booking-review-line booking-receipt-total"><div></div><div><h3>Estimated total</h3><p>Subject to team confirmation</p></div><strong>'+money(receipt.total)+'</strong></div>';
+ $('#booking-confirmation-summary').innerHTML='<p class="booking-receipt-brief"><strong>'+esc(savedCampaigns(receipt).map(choice=>campaignLabels[choice]).join(' · '))+'</strong><span>'+receipt.weeks+' '+(receipt.weeks===1?'week':'weeks')+(receipt.start?' - Preferred start '+esc(new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(receipt.start+'T12:00:00'))):' - Start date to confirm')+'</span></p>'+reviewMarkup(receipt.placements,receipt.weeks,false)+'<div class="booking-review-line booking-receipt-total"><div></div><div><h3>Estimated total</h3><p>Subject to team confirmation</p></div><strong>'+money(receipt.total)+'</strong></div>';
  if(history)window.history.pushState({step:4},'','#received');window.scrollTo({top:0,behavior:'instant'});$('#booking-confirmation').focus({preventScroll:true});
 }
 $('#booking-print').addEventListener('click',()=>window.print());
@@ -202,4 +254,5 @@ addEventListener('popstate',()=>{if(location.hash==='#received'&&receipt)showRec
 try{if(location.hash==='#received')receipt=JSON.parse(sessionStorage.getItem(receiptKey));}catch{}
 if(receipt?.reference&&receipt.placements?.every(item=>venues.some(venue=>venue.id===item.venue_id&&venue.facings.some(slot=>slot.id===item.slot_id))))showReceipt({history:false});
 else go(location.hash==='#review'?3:location.hash==='#locations'?2:1,{history:false,focus:false});
+$('.booking-campaigns').disabled=false;
 document.body.dataset.bookingReady='true';

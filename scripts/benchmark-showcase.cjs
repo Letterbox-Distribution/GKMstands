@@ -9,7 +9,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
    const context=await browser.newContext({viewport:{width,height:1000},deviceScaleFactor:2});
    const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
    const cdp=await context.newCDPSession(page);await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});let transferred=0;cdp.on('Network.loadingFinished',event=>transferred+=event.encodedDataLength);
-   await page.goto(base+(mode==='live'?'/?live=1':mode==='images'?'/?frames=1&images=1':'/'),{waitUntil:'commit'});
+   await page.goto(base+'/showcase'+(mode==='live'?'?live=1':mode==='images'?'?frames=1&images=1':''),{waitUntil:'commit'});
    await page.waitForFunction(()=>document.querySelector('#showcase')?.dataset.ready==='true',null,{timeout:90000});
    const readyMs=await page.evaluate(()=>performance.now());const initialBytes=transferred;
    const metrics=await page.evaluate(async()=>{

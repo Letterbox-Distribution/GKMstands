@@ -1,0 +1,33 @@
+{% extends 'edition-base.html' %}
+{% block title %}Workplace audiences | Gold Key Media Edition{% endblock %}
+{% block body_class %}edition-home workplace{% endblock %}
+{% block content %}
+<header class="workplace-dark"><div class="workplace-wrap workplace-page-intro">
+  <h1>Who you can reach</h1>
+  <p>Reach employees and visitors in the workplaces that fit your campaign.</p>
+</div></header>
+<section class="workplace-wrap workplace-section" aria-label="Workplace audience profiles">
+  <div class="workplace-audience-grid">
+    <article class="workplace-audience">
+      <figure><img src="/static/editorial/workplace-reception.webp" alt="" width="1536" height="1024" decoding="async"></figure>
+      <h2>Headquarters teams</h2><p>Reach employees at a specific organisation or in a target industry.</p>
+      <a class="workplace-link" href="{{ url_for('locations', setting='Office lobby') }}">Browse office lobbies <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="workplace-audience">
+      <figure><img src="/static/venue-photos/office.webp" alt="" width="960" height="600" decoding="async"></figure>
+      <h2>Shared office workforces</h2><p>Reach people from several businesses in the same building.</p>
+      <a class="workplace-link" href="{{ url_for('locations', setting='Shared workspace') }}">Browse shared workspaces <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="workplace-audience">
+      <figure><img src="/static/editorial/workplace-hero.webp" alt="" width="1448" height="1086" decoding="async"></figure>
+      <h2>Business visitors</h2><p>Reach clients and guests while they wait in reception.</p>
+      <a class="workplace-link" href="{{ url_for('locations', q='Business visitors') }}">Browse venues for business visitors <span aria-hidden="true">→</span></a>
+    </article>
+  </div>
+  <p class="workplace-audience-note">Representative images. Links show example locations.</p>
+</section>
+<section class="workplace-dark"><div class="workplace-wrap workplace-band">
+  <div><h2>Find the right setting</h2><p>Browse by city, venue type or audience.</p></div>
+  <a class="workplace-button" href="/locations">Explore locations <span aria-hidden="true">→</span></a>
+</div></section>
+{% endblock %}

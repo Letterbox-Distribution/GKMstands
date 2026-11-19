@@ -19,7 +19,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
     }
     requestAnimationFrame(sample);
    },skipIntro);
-   await page.goto(base);
+   await page.goto(base+'/showcase');
    await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
    // Begin measuring on the first wheel event; never wait for GPU warmup.
    await page.mouse.move(width*.65,450);

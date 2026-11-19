@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1100},reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://127.0.0.1:5000');await page.locator('.hero-discover').click();await page.locator('#campaign-type').selectOption('general');await page.locator('#show-matches').click();
+  await page.goto('http://127.0.0.1:5000/?view=original');await page.locator('.hero-discover').click();await page.locator('#campaign-type').selectOption('general');await page.locator('#show-matches').click();
   assert.equal(await page.locator('.demo-location-dot').count(),150);
   assert.equal(await page.locator('.location-hit-target[role=button]').count(),150);
   await page.locator('[data-city=Birmingham]').click();await page.locator('[data-city=Manchester]').click();

@@ -1,0 +1,7 @@
+{% macro client_logos(clients, duplicate=false) %}
+<ul class="workplace-client-logos{% if duplicate %} workplace-client-repeat{% endif %}"{% if duplicate %} aria-hidden="true"{% endif %}>
+  {% for slug, name in clients %}
+  <li><img src="/static/editorial/clients/{{ slug }}.webp" alt="{{ '' if duplicate else name }}" width="136" height="54" decoding="async"></li>
+  {% endfor %}
+</ul>
+{% endmacro %}

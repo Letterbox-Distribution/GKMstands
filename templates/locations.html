@@ -1,0 +1,86 @@
+{% extends 'edition-base.html' %}
+{% block title %}Explore locations | Gold Key Media Edition{% endblock %}
+{% block body_class %}edition-home workplace workplace-directory{% endblock %}
+{% block content %}
+<header class="workplace-dark"><div class="workplace-wrap workplace-page-intro">
+  <h1>Explore locations</h1>
+  <p>Find an example venue and see how an A5 campaign could take shape.</p>
+  <a class="workplace-link workplace-installation-link" href="#workplace-installations">See real installations <span aria-hidden="true">↓</span></a>
+</div></header>
+<section class="workplace-wrap workplace-section" aria-label="Location search and results">
+  <form class="workplace-filters" method="get" action="/locations">
+    <div><label for="locations-search">Search locations</label><input id="locations-search" name="q" type="search" maxlength="100" value="{{ query }}" placeholder="Name, neighbourhood or audience"></div>
+    <div><label for="locations-city">City</label><select id="locations-city" name="city"><option value="">All cities</option>{% for option in cities %}<option{% if option == city %} selected{% endif %}>{{ option }}</option>{% endfor %}</select></div>
+    <div><label for="locations-setting">Venue type</label><select id="locations-setting" name="setting"><option value="">All settings</option>{% for option in settings %}<option{% if option == setting %} selected{% endif %}>{{ option }}</option>{% endfor %}</select></div>
+    <button class="workplace-button" type="submit">Search</button>
+  </form>
+  <div class="workplace-results-summary">
+    <div><p><strong>{{ venues|length }} example {{ 'location' if venues|length == 1 else 'locations' }}</strong></p><p class="workplace-directory-note">Illustrative venues, audiences and rates. Images show representative settings.</p></div>
+    {% if city or setting or query %}<a class="workplace-link" href="/locations">Clear filters</a>{% endif %}
+  </div>
+  {% if venues %}
+  <div class="workplace-location-grid">
+    {% for venue in venues %}
+    <article class="workplace-location">
+      <div class="workplace-location-photo">
+        <img src="{{ setting_photos.get(venue.type, '/static/venue-photos/office.webp') }}" alt="" width="960" height="600" {% if loop.index > 3 %}loading="lazy"{% endif %} decoding="async">
+        <span>{{ venue.type }}</span>
+      </div>
+      <div class="workplace-location-copy">
+        <p class="workplace-location-area">{{ venue.area }} · {{ venue.city }}</p>
+        <h2>{{ venue.name }}</h2>
+        {% if venue.audiences or venue.descriptors %}<p>{{ ((venue.audiences or []) + (venue.descriptors or []))|join(' · ') }}</p>{% endif %}
+        <div class="workplace-location-action">
+          {% if venue.id in starting_pence %}
+            {% set pence = starting_pence[venue.id] %}
+            <p class="workplace-location-rate">From <strong>£{{ '{:,.2f}'.format(pence / 100) if pence % 100 else '{:,}'.format(pence // 100) }}</strong> <span>per A5 space / week</span></p>
+            <a class="workplace-link" href="{{ url_for('plan_campaign', venue=venue.id) }}">Plan for this location <span aria-hidden="true">→</span><span class="sr-only"> {{ venue.name }}</span></a>
+          {% else %}
+            <a class="workplace-link" href="{{ url_for('plan_campaign') }}">Explore campaign options <span aria-hidden="true">→</span></a>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p>No locations match your search. Try a different name or clear the filters.</p>
+  {% endif %}
+</section>
+<section id="workplace-installations" class="workplace-dark" aria-labelledby="installations-title">
+  <div class="workplace-wrap workplace-section">
+    <h2 id="installations-title">Digital screen advertising</h2>
+    <p>Gold Key Media also runs digital screens in workplace receptions. These photos show existing installations. Ask us separately about screen advertising or A5 availability at these venues.</p>
+    <div class="workplace-installation-grid">
+      {% for slug, name, height in [('zig-zag-building', 'Zig Zag Building', 932), ('dashwood-house', 'Dashwood House', 938), ('4-new-street-square', '4 New Street Square', 932)] %}
+      <figure>
+        <img src="/static/editorial/installations/{{ slug }}.webp" alt="Gold Key Media rack and screen at {{ name }}" width="699" height="{{ height }}" loading="lazy" decoding="async">
+        <figcaption>{{ name }}</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+    <div class="workplace-digital-details">
+      <section aria-labelledby="digital-audience-title">
+        <h3 id="digital-audience-title">Digital-screen audience</h3>
+        <p>The Gold Key Media deck profiles AB-classified professionals in corporate offices in London and Manchester.</p>
+        <dl class="workplace-network-stats">
+          <div><dt>Estimated daily audience</dt><dd>~150,000</dd></div>
+          <div><dt>Screens reported</dt><dd>60+</dd></div>
+          <div><dt>Reported audience split</dt><dd>57% male · 43% female</dd></div>
+        </dl>
+        <p class="workplace-network-note">Source: Gold Key Media digital-screen sales deck. Figures apply to screens only.</p>
+      </section>
+      <section aria-labelledby="digital-specs-title">
+        <h3 id="digital-specs-title">Digital screen specifications</h3>
+        <p>Adverts are delivered remotely and can be scheduled.</p>
+        <dl class="workplace-network-stats">
+          <div><dt>Display</dt><dd>46 × 25 in</dd></div>
+          <div><dt>Screen loop</dt><dd>60 seconds</dd></div>
+          <div><dt>Ad slots</dt><dd>10, 20 or 30 seconds</dd></div>
+        </dl>
+        <a class="workplace-link" href="mailto:info@gkml.co.uk?subject=Digital%20screen%20advertising">Ask about digital advertising <span aria-hidden="true">↗</span></a>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}

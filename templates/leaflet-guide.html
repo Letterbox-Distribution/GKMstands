@@ -1,0 +1,52 @@
+{% extends 'edition-base.html' %}
+{% block title %}A5 leaflet design guide | Gold Key Media Edition{% endblock %}
+{% block body_class %}edition-home workplace workplace-guide{% endblock %}
+{% block content %}
+<header class="workplace-dark"><div class="workplace-wrap workplace-page-intro">
+  <h1>Design a leaflet people will pick up</h1>
+  <p>Lead with one clear offer. Give readers one easy next step.</p>
+  <a class="workplace-link" href="#artwork-checklist">Jump to the artwork checklist <span aria-hidden="true">↓</span></a>
+</div></header>
+<section class="workplace-wrap workplace-section workplace-guide-example" aria-labelledby="guide-example-title">
+  <h2 id="guide-example-title">One offer, two sides</h2>
+  <p>A sample hotel campaign, from the first glance at the rack to the booking page.</p>
+  <div class="workplace-examples">
+  <article class="workplace-example">
+    <h3>Front <span>Catch the eye</span></h3>
+    <div class="workplace-leaflet workplace-leaflet-travel">
+      <span>Weekend stays</span><strong>Make Friday feel like a holiday.</strong>
+      <img src="/static/editorial/hotel-editorial-600.webp" alt="A softly lit hotel lounge" width="600" height="750" loading="lazy">
+      <p><b>15% off selected Friday stays</b></p>
+    </div>
+    <p>Put the headline high so it’s visible in the rack. Use one photo to show what the reader gets.</p>
+  </article>
+  <article class="workplace-example">
+    <h3>Back <span>Make it easy to act</span></h3>
+    <div class="workplace-leaflet workplace-leaflet-back">
+      <span>Friday stay offer</span><strong>Book your Friday escape</strong>
+      <p>Save 15% on selected Fridays booked in advance. Subject to availability.</p>
+      <blockquote>“An easy escape for the weekend.”<cite>Sample review</cite></blockquote>
+      <div class="workplace-leaflet-scan">
+        <img src="/static/editorial/leaflet-demo-qr.png" alt="Demo QR code linking to Gold Key Media" width="296" height="296" loading="lazy">
+        <p><b>Scan to book</b><small>Demo opens <a href="https://www.gkml.co.uk/">Gold Key Media</a></small></p>
+      </div>
+    </div>
+    <p>Keep terms near the offer. If a customer review helps, use a genuine one with permission. Send the QR code straight to the offer.</p>
+  </article>
+  </div>
+</section>
+<section id="artwork-checklist" class="workplace-dark" aria-labelledby="checklist-title">
+  <div class="workplace-wrap workplace-section">
+    <h2 id="checklist-title">Before you send your artwork</h2>
+    <ul class="workplace-artwork-checks">
+      <li><strong>Check the size</strong><p>Set the design to A5 portrait, 148 × 210 mm. Ask us to confirm final file and bleed requirements.</p></li>
+      <li><strong>Print a proof</strong><p>At actual size, check the headline, offer and terms. Keep important text away from the trim edge.</p></li>
+      <li><strong>Try the next step</strong><p>Scan the printed QR code on a phone. Include a short web address and check the offer page on mobile.</p></li>
+    </ul>
+  </div>
+</section>
+<section><div class="workplace-wrap workplace-band">
+  <div><h2>Still working on your artwork?</h2><p>You can <a class="workplace-link" href="{{ url_for('plan_campaign') }}">plan a campaign</a> while your design is in progress.</p></div>
+  <a class="workplace-button" href="mailto:info@gkml.co.uk?subject=Leaflet%20design%20and%20print%20enquiry">Ask about design and print <span aria-hidden="true">↗</span></a>
+</div></section>
+{% endblock %}

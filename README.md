@@ -1,5 +1,11 @@
 # GoldKey Select
 
+The workplace advertising site is served at `/`. The audience profiles, example location directory, leaflet design guide and booking flow are at `/audiences`, `/locations`, `/leaflet-guide` and `/plan` respectively. The stand showcase remains at `/showcase`. Set `GKM_BOOKING_LEAD_DAYS` to the agreed minimum number of calendar days for artwork, production and delivery. The default is 14 days.
+
+## Original planner
+
+The following notes describe the original single-page planner at `/?view=original`.
+
 The current UI follows the owner's friendly Letterbox reference: larger Manrope text, navy copy, mint controls and a lavender preview button. `static/friendly.css` supplies this design layer; `static/map-workspace.css` supplies the contained map with floating venue panel. The current design concept is `docs/friendly-concept.png`. City pills show fixture counts and independently include/exclude London, Birmingham and Manchester, fading excluded cities and gently reframing the map. Counts are derived from the fixture (currently 3 per city), not real inventory claims. See `docs/verification.md` for browser and visual checks.
 
 The entire journey is now one continuous page: map and venues, the interactive stand/artwork section, then the order preview. `static/one-page.css` supplies the inline layout. Header, placement and summary buttons scroll between sections; neither stand nor order is a modal.

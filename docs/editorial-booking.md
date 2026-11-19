@@ -4,9 +4,15 @@ The main homepage now runs: existing showcase, client-logo marquee, Gold Key Med
 
 The booking journey is **Your campaign → Your locations → Review & request**. It supports six A5 positions per location, photos, numbered brown map pins with city grouping, optional artwork, editable selections, over-budget messaging, a fixed review bar, a saved reference and a printable receipt. Refreshing the receipt does not submit another request. Campaign drafts use session storage; contact details are not stored in the browser draft.
 
-Requests are stored privately in `instance/booking-requests.sqlite3`, including optional artwork. The server calculates the quote from inventory rather than trusting a submitted price, checks placements and files, and prevents duplicate submissions using a request key. This is a request queue for human confirmation, not a reservation or payment system. Current venues/rates remain illustrative and are labelled in the booking flow. No automatic email notification or payment integration is configured.
+Requests are stored privately in `instance/booking-requests.sqlite3`, including optional artwork. The server prices the selected positions from inventory and uses a request key to prevent repeat submissions. A team member reviews the request and confirms availability and the final quote. The planner labels its example venues and rates.
 
-Review the queue with `python -m flask --app app booking-requests`. Inspect one request with `python -m flask --app app booking-requests --reference GKE-...`. Set `GKM_BOOKING_DB` to use another private database and `GKM_SECRET_KEY` to keep form signing stable between server restarts. Do not put the database or customer artwork in `static/`; `instance/` is git-ignored. Browser QA uses an isolated temporary database.
+### Quote handoff
+
+1. Assign the shared quote inbox to a team member. Set `GKM_BOOKING_SMTP_HOST`, `GKM_BOOKING_SMTP_FROM` and `GKM_BOOKING_SMTP_TO` to enable notifications. Use `GKM_BOOKING_SMTP_USERNAME` and `GKM_BOOKING_SMTP_PASSWORD` if the SMTP server requires login. STARTTLS uses port 587 by default. For implicit TLS, set `GKM_BOOKING_SMTP_TLS=implicit` (default port 465). Use `GKM_BOOKING_SMTP_PORT` to override the port.
+2. Review the queue with `python -m flask --app app booking-requests`. Inspect a request and its email status with `python -m flask --app app booking-requests --reference GKE-...`. The email has the customer’s reply address. Optional artwork stays in private storage.
+3. Run `python -m flask --app app booking-notify` periodically from the host with SMTP and database access. It retries pending and failed emails, plus attempts left in progress for more than 10 minutes. To retry one request, add `--reference GKE-...`. Check the shared inbox with a test quote before launch.
+
+Set `GKM_BOOKING_DB` to a private database path on a persistent volume for live requests and `GKM_SECRET_KEY` to a stable secret shared across web instances. Keep both the database and artwork outside `static/`. The Vercel default uses temporary storage and is suitable for previews only. A live Vercel planner needs a durable storage backend for requests, artwork and pending notifications.
 
 ## Visual specification and comparison
 
@@ -57,4 +63,4 @@ The public contact email is info@gkml.co.uk, checked against Gold Key Media's of
 
 Location cards show the range of position prices. The six A5 buttons retain numbers 1-6 in a framed 2-column, 3-row diagram; selection adds a tick without losing the number. The phone basket is approximately 91px high with an over-budget message. The booking header is opaque so cards do not blur behind the navigation.
 
-The showcase scroll distance is approximately 20% shorter. Mobile frames were regenerated to fit the complete stand width, with the floor anchor raised for the final view; the master model and interactive camera use the same framing rules. Desktop imagery is unchanged. QA passed at widths 320, 390, 768 and 1440, including FAQ disclosure, slot selection, prices, basket height, artwork and map handoff. Demo SQLite storage remains unchanged; automatic team email and production storage remain separate configuration work.
+The showcase scroll distance is approximately 20% shorter. Mobile frames were regenerated to fit the complete stand width, with the floor anchor raised for the final view; the master model and interactive camera use the same framing rules. Desktop imagery is unchanged. QA passed at widths 320, 390, 768 and 1440, including FAQ disclosure, slot selection, prices, basket height, artwork and map handoff.

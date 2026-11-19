@@ -6,7 +6,7 @@ const assert=require('node:assert/strict');
   const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'no-preference'});
   if(process.env.ADVERT_HD==='1')await page.addInitScript(()=>{Object.defineProperty(navigator,'mediaCapabilities',{value:{decodingInfo:async()=>({supported:true,smooth:true,powerEfficient:true})}});Object.defineProperty(navigator,'connection',{value:{saveData:false,effectiveType:'4g'}});});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(process.env.BASE_URL||'http://127.0.0.1:5000');
+  await page.goto((process.env.BASE_URL||'http://127.0.0.1:5000')+'/showcase');
   await page.waitForFunction(()=>document.body.dataset.entryReady==='true',null,{timeout:90000});
   await page.waitForFunction(()=>document.querySelector('.native-screen-video')?.currentTime>.25);
   const metadata=await page.locator('.native-screen-video').evaluate(v=>({width:v.videoWidth,height:v.videoHeight,duration:v.duration,muted:v.muted,loop:v.loop,hidden:v.hidden,transform:getComputedStyle(v).transform}));

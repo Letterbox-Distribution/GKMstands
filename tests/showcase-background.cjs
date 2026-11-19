@@ -7,7 +7,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:5001';
   for(const width of [1440,390]){
    const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:2});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
-   await page.goto(base);await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
+   await page.goto(base+'/showcase');await page.waitForFunction(()=>document.body.dataset.entryReady==='true');
    async function checkWhite(label){
     const pixels=await page.locator('#showcase-viewport canvas').evaluate(canvas=>{
      const ctx=canvas.getContext('2d');
